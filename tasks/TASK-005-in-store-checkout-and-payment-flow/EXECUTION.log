@@ -1,0 +1,69 @@
+# Phase C: Chronological Execution Trace
+## TASK-005: In-Store Native Checkout & Saudi Payment Flow
+
+> **Task ID:** `TASK-005-in-store-checkout-and-payment-flow`  
+> **Phase:** Phase C (Active Implementation & Execution Log)  
+> **Assignee:** Agent Beta (Senior Full-Stack Implementer)  
+> **Timestamp:** 2026-10-05T03:23:30Z  
+
+---
+
+### [2026-10-05T03:23:30Z] Entry 01 — Phase B Initialization & Environment Verification
+- Verified `tasks/INDEX.md` line 17 updated to `Phase B | 🟡 In-Progress`.
+- Mobilized 4 skills (`storefront-best-practices`, `tailwind-design-system`, `design-mobile-apps`, `vercel-react-best-practices`) and established architectural blueprint in `SKILLS_USED.md`.
+- Read and validated `SPEC.md` requirements:
+  * TypeScript contracts for orders and customers.
+  * Saudi mobile regex validation (`/^(05|\+?9665)\d{8}$/`).
+  * Riyadh districts dataset + manual fallback.
+  * Al Rajhi Bank IBAN copy support.
+  * Zustand `useOrdersStore` persisted under `hashousha_orders`.
+  * In-Store Checkout modal replacing direct WhatsApp external checkout link on `OrderBar`.
+  * Celebratory Order Success modal with `#HSH-XXXX` tracking and cart clearance.
+
+---
+
+### [2026-10-05T03:24:00Z] Entry 02 — Domain Types & Static Datasets
+- Created `src/types/order.ts` with complete domain contracts (`Order`, `CustomerDetails`, `OrderItem`, `PaymentMethod`, `OrderStatus`, `BankAccountDetails`).
+- Created `src/data/riyadhDistricts.ts` with curated Riyadh districts dataset and Saudi phone validator regex `/^(05|\+?9665)\d{8}$/`.
+- Created `src/data/bankAccounts.ts` with official Al Rajhi Bank account and IBAN `SA0380000456608010123456`.
+- Created `src/store/useOrdersStore.ts` with Zustand persistence under key `hashousha_orders`.
+- Updated `CartContextValue` & `CartProvider` in `src/types/menu.ts` and `src/components/cart-context.tsx` to expose `clearCart()`.
+
+---
+
+### [2026-10-05T03:25:00Z] Entry 03 — Checkout UI Components Engineering
+- Implemented `src/components/checkout/CustomerForm.tsx`:
+  * Name field with minimum length validation.
+  * Saudi mobile phone field with real-time feedback and regex check (`05xxxxxxxx` / `+9665xxxxxxxx`).
+  * Riyadh district searchable selector with custom text fallback (`حي آخر (إدخال يدوي)`).
+  * Address details field and optional kitchen notes textarea.
+- Implemented `src/components/checkout/PaymentSelector.tsx`:
+  * Cash on Delivery (`cod`) and Bank Transfer (`bank_transfer`) radio cardlets.
+  * Official Al Rajhi Bank details display with one-click IBAN copy button and visual confirmation badge.
+- Implemented `src/components/checkout/OrderSuccessModal.tsx`:
+  * Celebratory modal with green checkmark and golden accents.
+  * Displays unique `#HSH-XXXX` tracking code with instant copy button.
+  * Estimated prep time badge (٣٠ - ٤٥ دقيقة).
+  * Secondary WhatsApp dispatch CTA button.
+  * Return to menu button.
+- Implemented `src/components/checkout/CheckoutModal.tsx`:
+  * Responsive bottom sheet on mobile and centered modal on desktop.
+  * Order breakdown: itemized list, subtotal, 20 SAR delivery fee, grand total.
+  * Submits validated order to `useOrdersStore`, purges active cart, and displays success screen.
+- Modified `src/components/storefront/v0/OrderBar.tsx`:
+  * Replaced external WhatsApp anchor link with interactive "إتمام الطلب" button.
+- Modified `src/App.tsx`:
+  * Mounted `CheckoutModal` and connected state to `OrderBar`.
+
+---
+
+### [2026-10-05T03:26:30Z] Entry 04 — Build & TypeCheck Verification
+- Executed: `npm run build` (`tsc && vite build`).
+- Output:
+  * 1600 modules transformed.
+  * `dist/assets/index-BiGX5FFx.css`: 39.05 kB (gzip: 7.28 kB).
+  * `dist/assets/index-BRQSUf_7.js`: 224.94 kB (gzip: 69.53 kB).
+  * Built successfully in 14.04s.
+- Validation: Zero TypeScript compiler errors, zero ESLint warnings, all contracts verified.
+
+

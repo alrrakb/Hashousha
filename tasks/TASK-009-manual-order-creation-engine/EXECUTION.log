@@ -1,0 +1,55 @@
+# Phase C: Chronological Execution Trace
+## TASK-009: Manual Order Creation Engine (Merchant Center)
+
+> **Task ID:** `TASK-009-manual-order-creation-engine`  
+> **Phase:** Phase C (Active Implementation & Execution Log)  
+> **Assignee:** Agent Beta (Senior Full-Stack Implementer)  
+> **Timestamp:** 2026-10-05T04:59:00Z  
+
+---
+
+### [2026-10-05T04:59:00Z] Entry 01 — Phase B Initialization & Environment Verification
+- Verified `tasks/INDEX.md` line 21 set to `Phase B | 🟡 In-Progress`.
+- Mobilized 4 skills (`storefront-best-practices`, `design-mobile-apps`, `tailwind-design-system`, `vercel-react-best-practices`) in `SKILLS_USED.md`.
+- Read and triaged `SPEC.md` requirements:
+  * Update `src/types/order.ts` with `'prepaid'` payment method.
+  * Build `src/components/admin/modules/CreateManualOrderModal.tsx`.
+  * Update `src/components/admin/modules/OrdersModule.tsx` with `[+ تسجيل طلب يدوي جديد]` CTA.
+  * Wire dishes pass-through in `MerchantCenter.tsx`.
+  * Ensure cloud persistence in Supabase `orders` and `order_items` via `saveOrderToSupabase`.
+  * Provide immediate 80mm kitchen ticket printing option.
+
+---
+
+### [2026-10-05T04:59:20Z] Entry 02 — Type Contract Update
+- Updated `src/types/order.ts` to include `'prepaid'` in `PaymentMethod` union type (`'cod' | 'bank_transfer' | 'prepaid'`).
+- Updated `KitchenTicket.tsx` payment label to display `'مدفوع مسبقاً (سداد/تحويل مباشر)'` for prepaid orders.
+
+---
+
+### [2026-10-05T05:00:50Z] Entry 03 — Component Construction
+- Built `src/components/admin/modules/CreateManualOrderModal.tsx`:
+  * Riyadh Customer Context: full name, validated Saudi mobile (`05xxxxxxxx`), 23 curated Riyadh districts + custom district text input, detailed address, and kitchen instructions.
+  * Interactive Catalog & Dish Picker: live search filter, quick-add pills, itemized lines table with `+ / -` steppers and delete action.
+  * Dynamic Financial Engine: live subtotal, flexible delivery fee (presets: 20 SAR standard, 0 SAR VIP free, 0 SAR branch pickup + custom input), direct discount input, and grand total.
+  * Payment Methods & Initial Status: Prepaid (`prepaid`), Cash on Delivery (`cod`), and Bank Transfer (`bank_transfer`), with initial kitchen status (`processing 🟣` or `pending 🟡`).
+  * Cloud persistence via `saveOrderToSupabase(newOrder)`.
+  * Direct state update via `addOrder(newOrder)`.
+  * Post-creation celebratory screen with immediate 80mm thermal prep ticket print trigger (`KitchenTicket`).
+
+---
+
+### [2026-10-05T05:01:10Z] Entry 04 — Orders Module Integration & Wiring
+- Updated `src/components/admin/modules/OrdersModule.tsx`:
+  * Added royal action button in header: `[+ تسجيل طلب يدوي جديد]`.
+  * Rendered `CreateManualOrderModal` and wired order creation dispatch.
+- Updated `src/components/admin/MerchantCenter.tsx`:
+  * Passed active catalog `dishes` prop to `OrdersModule`.
+
+---
+
+### [2026-10-05T05:02:40Z] Entry 05 — Production Build Verification
+- Ran `npm run build` (`tsc && vite build`).
+- Fixed unused `MapPin` import in `CreateManualOrderModal.tsx`.
+- Re-ran `npm run build`: Exit code 0 (1666 modules transformed, built in 30.41s).
+- All acceptance criteria verified.

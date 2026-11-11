@@ -1,0 +1,68 @@
+# Phase C: Execution Trace — TASK-013
+
+> **Task ID:** `TASK-013-customer-reviews-engine-and-merchant-moderation-hub`  
+> **Lifecycle Phase:** Phase C (Execution & Verification)  
+> **Implementer:** Agent Beta (Senior Full-Stack Implementer)  
+> **Timestamp:** 2026-10-05T23:18:00+03:00  
+
+---
+
+## Chronological Action Log
+
+1. **[Pre-flight Database Verification]**:
+   - Confirmed Supabase table `public.reviews` in project `oulzpjcmnxvvrpdyfpcg`.
+   - Verified columns: `id`, `dish_id`, `dish_name`, `customer_name`, `rating`, `comment`, `is_published`, `created_at`.
+   - Verified RLS policies allowing public read of published reviews, public insert, and admin full access.
+   - Verified seed reviews present for `warak-classic`, `malfouf-spicy`, `warak-box`.
+
+2. **[Phase B Mobilization]**:
+   - Authored `SKILLS_USED.md` documenting integration of 4 mandatory skills:
+     - `storefront-best-practices` (social proof trust architecture, 3-field form ergonomics).
+     - `tailwind-design-system` (Hashousha linen palette, high-contrast review tokens).
+     - `design-mobile-apps` (44px tactile 5-star selector, responsive layout).
+     - `vercel-react-best-practices` (optimistic state updates, debounced moderation toggles).
+
+3. **[Types & Domain Model Extension]**:
+   - Modified `src/types/admin.ts`:
+     - Added `'reviews'` to union type `AdminTab`.
+     - Defined and exported `AdminReview` interface matching domain requirements.
+
+4. **[Cloud Services Implementation]**:
+   - Modified `src/services/adminService.ts`:
+     - Added `fetchReviewsForDish(dishId: string): Promise<AdminReview[]>`.
+     - Added `fetchAllReviews(): Promise<AdminReview[]>`.
+     - Added `submitCustomerReview(review)`: persists new review to `public.reviews` with default `is_published: true`.
+     - Added `updateReviewPublishStatus(reviewId, isPublished)`.
+     - Added `deleteReview(reviewId)`.
+
+5. **[Storefront Reviews Sanitization & Dynamic Hydration]**:
+   - Modified `src/components/storefront/v0/ProductLandingPage.tsx`:
+     - Permanently removed neighborhood/district names (`حي النرجس`, `حي حطين`, `حي الملقا`).
+     - Standardized badge to `عميل موثّق 🌿` with emerald check icon.
+     - Added dynamic hydration hook loading published reviews from Supabase for current dish.
+     - Implemented interactive 3-field review submission form:
+       - Field 1: Name (`اسمك الكريم`).
+       - Field 2: 5-star touch-friendly selector (`تقييمك للطبق`) with hover/tap animations.
+       - Field 3: Textarea (`رأيك وتجربتك مع المذاق والتقديم`).
+     - Integrated optimistic update and warm confirmation toast: `شكراً لذوقك الرفيع! تم تسجيل تقييمك بنجاح 🌿`.
+
+6. **[Merchant Moderation Hub Creation]**:
+   - Created `src/components/admin/modules/ReviewsModule.tsx`:
+     - 4 KPI summary cards (Total, Average Rating, Published, Hidden).
+     - Real-time toolbar: search by text/customer, filter by dish, filter by publication status, filter by rating.
+     - Responsive review cards with full comment, dish tag, and creation date.
+     - Instant publication toggle (`[منشور بالمتجر 🟢]` vs `[مخفي عن الزوار ⚪]`) with optimistic feedback.
+     - Secure delete action with portaled confirmation modal (`z-[100]` full-screen blur).
+
+7. **[Navigation & Routing Integration]**:
+   - Modified `src/components/admin/MerchantSidebar.tsx`:
+     - Added `{ id: 'reviews', label: 'تقييمات العملاء', englishLabel: 'Reviews', icon: Star, badge: hiddenReviewsCount }`.
+     - Extended props with `hiddenReviewsCount`.
+   - Modified `src/components/admin/MerchantCenter.tsx`:
+     - Added `reviews` to `VALID_TABS` for URL and localStorage persistence.
+     - Added `reviews` tab title and subtitle.
+     - Mounted `<ReviewsModule onCountChange={setHiddenReviewsCount} />`.
+
+8. **[Quality & Build Verification]**:
+   - `npx tsc --noEmit`: Exit code 0 (Zero type errors).
+   - `npm run build`: Vite production build passed in 15.39s (Exit code 0).

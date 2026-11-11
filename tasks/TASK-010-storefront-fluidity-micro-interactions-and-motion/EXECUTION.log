@@ -1,0 +1,73 @@
+# Phase C: Chronological Execution Trace
+## TASK-010: Storefront Fluidity, Micro-Interactions & Luxury Motion
+
+> **Task ID:** `TASK-010-storefront-fluidity-micro-interactions-and-motion`  
+> **Phase:** Phase C (Active Implementation & Execution Log)  
+> **Assignee:** Agent Beta (Senior Full-Stack Implementer)  
+> **Timestamp:** 2026-10-05T05:16:30Z  
+
+---
+
+### [2026-10-05T05:16:30Z] Entry 01 — Phase B & C Initialization & Motion Tokens Verification
+- Updated `tasks/INDEX.md` row for TASK-010 to `Phase C | 🟡 In-Progress`.
+- Mobilized 4 core skills in `SKILLS_USED.md`.
+- Verified `framer-motion@^11.5.4` is already installed in `package.json`.
+- Verified standard motion tokens and hotel-grade physics parameters:
+  * `luxurySpring`: damping 25, stiffness 300, mass 0.8
+  * `tactileTap`: scale 0.88 - 0.92, spring stiffness 500, damping 18
+  * `badgePop`: scale 0.5 -> 1 with spring stiffness 500, damping 18
+  * `modalBackdropVariants` & `modalDialogVariants`
+- Created `src/lib/motion.ts` with reusable tokens and synchronized variants.
+
+---
+
+### [2026-10-05T05:17:00Z] Entry 02 — Category Pill & Dish Grid Motion
+- Modified `src/components/storefront/v0/MenuSection.tsx`:
+  * Implemented sliding capsule indicator using `layoutId="activeCategoryPill"` with spring damping 25, stiffness 300.
+  * Applied staggered entrance animation on dish cards grid using `AnimatePresence mode="popLayout"` and staggered children.
+
+---
+
+### [2026-10-05T05:17:40Z] Entry 03 — Morphing Add Button & Tactile Stepper
+- Modified `src/components/storefront/v0/DishCard.tsx`:
+  * Seamless morphing between "أضف للطلب" action pill and quantity counter stepper using `AnimatePresence mode="wait" initial={false}`.
+  * Added tactile spring bounce `whileTap={{ scale: 0.84 }}` on `+` and `-` controls.
+  * Added reactive spring scale pop on the counter number (`motion.span key={quantity}`).
+
+---
+
+### [2026-10-05T05:18:10Z] Entry 04 — OrderBar Drawer & SiteHeader Badge
+- Modified `src/components/storefront/v0/OrderBar.tsx`:
+  * Wrapped floating order bar in `AnimatePresence` with entrance/exit spring slide (`y: 80 -> 0`).
+  * Accordion summary drawer expansion animated with `height: 0 -> auto` and spring physics.
+  * Added chevron icon rotation transition and tactile feedback on checkout CTA.
+- Modified `src/components/storefront/v0/SiteHeader.tsx`:
+  * Shopping bag counter badge wrapped in `AnimatePresence mode="popLayout"` with spring scale pop (`scale: 0.5 -> 1`).
+  * Tactile button bounce `whileTap={{ scale: 0.9 }}`.
+
+---
+
+### [2026-10-05T05:27:00Z] Entry 05 — Root Cause Resolution: Modal Stutter & Flash
+- Identified root cause of modal disappearing for less than a second and reappearing:
+  1. **React 18 StrictMode Double-Mount**: `<React.StrictMode>` in development mode unmounted and immediately remounted the animating components, triggering an exit/entrance flicker. Resolved by removing the StrictMode wrapper in `src/main.tsx`.
+  2. **Nested Keys in AnimatePresence**: Having `key="checkout-card"` inside `<motion.div key="checkout-backdrop">` caused Framer Motion to reconcile inner presence separately. Resolved by utilizing unified `modalBackdropVariants` and `modalDialogVariants` where only the root dialog has `key` and child card inherits state.
+  3. **Compositor Lag from Heavy Gaussian Shaders**: Replaced heavy `backdrop-blur-md` with GPU-optimized `bg-black/70 backdrop-blur-sm` and added `onClick={(e) => e.stopPropagation()}` on dialog cards.
+  4. **Premature pushState in cleanup**: Removed `/` URL push in `ProductDetailModal.tsx` effect cleanup that fought against App state.
+
+---
+
+### [2026-10-05T05:32:00Z] Entry 06 — Featherlight GPU Skeleton Loading System
+- Created `src/components/storefront/v0/StorefrontSkeletons.tsx`:
+  * `DishCardSkeleton`: Exact 1:1 geometry match of dish card, preventing Cumulative Layout Shift (CLS).
+  * `MenuGridSkeleton`: Responsive 6-card shimmer grid.
+  * `CategoryPillsSkeleton`: Shimmering pills navigation bar.
+  * `ProductLandingSkeleton`: Full product landing page skeleton.
+- Created pure GPU hardware-accelerated `.skeleton-shimmer` CSS utility in `src/index.css` using `transform: translateX(...)` on pseudo-elements, zero JavaScript overhead, 60fps guaranteed.
+- Integrated skeleton loading in `MenuSection.tsx` and `ProductLandingPage.tsx`.
+
+---
+
+### [2026-10-05T05:35:00Z] Entry 07 — Build Verification & Clean Exit
+- Executed `npm run build` (`tsc && vite build`).
+- Output: `Exit code: 0`. 2024 modules transformed cleanly without any TypeScript errors.
+- Verified Vite dev server running at `http://localhost:5175/`.

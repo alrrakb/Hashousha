@@ -1,0 +1,69 @@
+{
+  "system_version": "2.23.0",
+  "project_name": "HASHOUSHA (هشوشة) — Online Luxury Food Boutique",
+  "last_synced": "2026-11-11T17:54:00Z",
+  "active_milestone": "Milestone 23 — Environment Variables Hardening & Secrets Sanitization",
+  "active_task_id": "TASK-027-environment-variables-hardening-and-secrets-sanitization",
+  "workflow_phase": "PHASE_D_POST_MORTEM_COMPLETED",
+  "authorized_agent_now": "AGENT_ALPHA",
+  "code_modification_locked": true,
+  "system_roster": {
+    "AGENT_CHIEF_OF_STAFF": {
+      "role": "Brand Chief of Staff & Creative Intent Translator",
+      "allowed_actions": ["listen_to_founder", "translate_food_vision", "formulate_architectural_directives", "draft_beta_delegation_prompts"],
+      "blocked_actions": ["write_spec_md", "modify_production_code", "execute_code_on_trigger_words_like_start_or_approved"]
+    },
+    "AGENT_ALPHA": {
+      "role": "Lead Software Architect & Creative Director",
+      "allowed_actions": ["author_spec_md", "manage_design_system", "discover_and_install_skills", "audit_and_sign_off"],
+      "blocked_actions": ["modify_production_code", "bypass_spec_lifecycle", "execute_code_on_trigger_words_like_start_or_approved"]
+    },
+    "AGENT_BETA": {
+      "role": "Senior Full-Stack Implementer",
+      "allowed_actions": ["read_spec_md", "mobilize_skills", "implement_react_tailwind_code", "run_build_verification", "write_execution_log_and_post_mortem"],
+      "blocked_actions": ["modify_code_without_spec", "ad_hoc_styling_outside_tokens", "interact_with_founder_on_strategy"]
+    }
+  },
+  "brand_context": {
+    "brand_name": "Hashousha (هشوشة للبابكا الحرفية والمخبوزات الفاخرة)",
+    "market": "Riyadh, Kingdom of Saudi Arabia (الرياض)",
+    "primary_whatsapp_channel": "966598956580",
+    "supabase_project_url": "https://oulzpjcmnxvvrpdyfpcg.supabase.co",
+    "color_palette": {
+      "primary": "Warm Bronze & Gold (#9E774C)",
+      "accent_pomegranate": "Pomegranate Red (#931F2D)",
+      "background_ivory": "Warm Ivory (#FAF7F2)",
+      "card_surface": "Linen Warm (#FDFBF7)",
+      "foreground": "Dark Roasting (#2E1E0D)"
+    }
+  },
+  "task_pipeline_status": {
+    "TASK-001": "Completed (Scaffolding & Theme Tokens)",
+    "TASK-002": "Completed (Legacy Reverse-Engineering & Skills Engine)",
+    "TASK-003": "Completed (Customer Storefront & Catalog Engine)",
+    "TASK-004": "Completed (V0 Design & Real Assets Migration)",
+    "TASK-005": "Completed (In-Store Checkout & Saudi Payment Flow)",
+    "TASK-006": "Completed (Kitchen Orders Management Dashboard - Shbakhur)",
+    "TASK-007": "Completed (Cloud Launch & Security Hardening - Supabase)",
+    "TASK-008": "Completed (Merchant Center, Catalog CRUD & Hybrid SEO)",
+    "TASK-009": "Completed (Manual Order Creation Engine - Orders Module)",
+    "TASK-010": "Completed (Storefront Fluidity, Micro-Interactions & Motion)",
+    "TASK-011": "Completed (Luxury Skeleton Loading & Perceived Performance)",
+    "TASK-012": "Completed (Rich Product Page, Long Description, Reviews & Related Dishes)",
+    "TASK-013": "Completed (Customer Reviews Engine & Merchant Moderation Hub)",
+    "TASK-014": "Completed (Storefront Hero Highlights & Brand Pillars)",
+    "TASK-015": "Completed (Babka Brand Identity & Hero Realignment)",
+    "TASK-016": "Completed (Modal Thumbnail, Floating WhatsApp & Site Content CMS)",
+    "TASK-017": "Completed (Luxury Dark Mode Theme Engine & Storefront Toggles)",
+    "TASK-018": "Completed (Storefront Granular Micro-Copy CMS & Advanced UI Controls)",
+    "TASK-019": "Completed (Storefront Home, Catalog, OrderBar & Admin Dashboard Dark Roast Refinement)",
+    "TASK-020": "Completed (Full Storefront Micro-Copy Democratization & CMS Search UX Fix)",
+    "TASK-021": "Completed (Artisanal Babka Full Catalog Migration & Visual Assets Generation)",
+    "TASK-022": "Completed (SEO Persistence, Supabase RLS & Dynamic Head Tags)",
+    "TASK-023": "Completed (Luxury Gold Brand Emblem Social OG & WhatsApp Card)",
+    "TASK-024": "Completed (Admin Theme & Palette Customizer & Honey Amber Noir Mode)",
+    "TASK-025": "Completed (Multi-Size Variants, Hospitality Capacity & Category Realignment)",
+    "TASK-026": "Completed (Client-Side WebP Image Optimization, Favicon Uploader & Master Dark Mode Circuit Breaker)",
+    "TASK-027": "Completed (Environment Variables Hardening & Secrets Sanitization)"
+  }
+}

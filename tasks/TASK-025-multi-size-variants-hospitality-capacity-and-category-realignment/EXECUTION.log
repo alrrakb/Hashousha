@@ -1,0 +1,114 @@
+# EXECUTION LOG: TASK-025 (Phase C)
+## Task: Multi-Size Variants, Hospitality Capacity & Category Realignment
+### Implementer: Agent Beta (Senior Implementer)
+### Authority: Agent Alpha (Lead Software Architect & Creative Director)
+### Date: 2026-10-13
+
+---
+
+### Step 1: Mobilization & Pre-flight Audit
+- Verified architecture specification in `tasks/TASK-025-multi-size-variants-hospitality-capacity-and-category-realignment/SPEC.md`.
+- Mobilized storefront-best-practices and tailwind-design-system skills in `SKILLS_USED.md`.
+- Inspected existing schema on Supabase project `oulzpjcmnxvvrpdyfpcg`.
+
+---
+
+### Step 2: Supabase Cloud Database DDL & Category Reseeding
+- Created migration script `supabase/migrations/20261013_variants_and_categories.sql`.
+- Added column `variants JSONB` to `public.dishes` table via Supabase MCP `execute_sql`:
+  ```sql
+  ALTER TABLE dishes ADD COLUMN IF NOT EXISTS variants JSONB;
+  ```
+- Created and executed TypeScript script `scripts/sync-categories.ts` using `@supabase/supabase-js` to purge legacy categories and seed the 6 sovereign categories:
+  1. `plain-dough-babka`: البابكا بعجين ساده (Plain Dough Babka) - sort_order 10
+  2. `cocoa-dough-babka`: البابكا بعجين كاكاو (Cocoa Dough Babka) - sort_order 20
+  3. `sweet-babka`: البابكا الحلوه (Sweet Babka) - sort_order 30
+  4. `savory-babka`: البابكا المالحة (Savory Babka) - sort_order 40
+  5. `babka-boxes`: بوكسات البابكا (Babka Hospitality Boxes) - sort_order 50
+  6. `cookies`: الكوكيز (Artisanal Cookies) - sort_order 60
+- Verified all 6 rows active in Supabase `categories` table.
+
+---
+
+### Step 3: TypeScript Definitions Modernization
+- Updated `src/types/menu.ts`:
+  - Defined `DishVariant` interface (`id`, `name`, `englishName`, `price`, `servingInfo`, `inStock`).
+  - Added `variants?: DishVariant[]` to `Dish` interface.
+  - Aligned `CategoryId` with the 6 sovereign categories.
+  - Updated `CartLine` to include `lineKey: string`, `variant?: DishVariant`, `unitPrice: number`.
+  - Updated `CartContextValue` methods: `add(id: string, variantId?: string)`, `remove(id: string, variantId?: string)`.
+- Updated `src/types/order.ts`:
+  - Added optional `variantId?: string`, `variantName?: string`, and `servingInfo?: string` to `OrderItem`.
+
+---
+
+### Step 4: Admin Service & Consolidated Catalog Realignment
+- Updated `src/services/adminService.ts`:
+  - Added `variants` to `CloudDishRow`, `fetchDishesFromSupabase`, and `saveDishToSupabase`.
+  - Updated `DEFAULT_ADMIN_CATEGORIES` to match the 6 official categories.
+- Consolidated `src/data/menu.ts`:
+  - Realigned default categories to the 6 official categories.
+  - Consolidated dishes into multi-size recipes with explicit `variants` (`mini`, `medium`, `family`, `box-12`, `box-24`, `single`, `box-6`, `box-12`) and quantitative `servingInfo`.
+
+---
+
+### Step 5: Cart Store & Context Refactoring
+- Refactored `src/store/useCartStore.ts`:
+  - Introduced `buildLineKey(dishId, variantId)` and `parseLineKey(lineKey)`.
+  - Key format: `${dishId}__${variantId}` or `${dishId}`.
+  - Updated `add(id, variantId)` and `remove(id, variantId)`.
+  - Refactored `getCartLines(quantities)` to look up dish and variant, calculating `unitPrice`.
+  - Refactored `getCartTotalPrice(quantities)` to sum `quantity * line.unitPrice`.
+  - Refactored `getCartTotalItems(quantities)` to sum all item counts.
+- Updated `src/components/storefront/v0/OrderBar.tsx`:
+  - Rendered `line.variant?.name` in summary and list items.
+  - Updated quantity controls to pass variant ID.
+
+---
+
+### Step 6: Storefront Components Enhancement
+- Updated `src/components/storefront/v0/DishCard.tsx`:
+  - Multi-size selector pills (`dish.variants`).
+  - Real-time active price update on pill selection.
+  - Quantitative serving capacity badge with `<Users className="size-3.5 shrink-0" />`.
+  - Variant-aware `add(dish.id, activeVariant?.id)` and `remove(dish.id, activeVariant?.id)`.
+- Updated `src/components/storefront/v0/ProductDetailModal.tsx`:
+  - Multi-size variant selector grid with size name, price, and serving capacity.
+  - Header metrics lockup synchronized with selected variant.
+  - Variant-aware cart addition and quantity stepper.
+- Updated `src/components/storefront/v0/ProductLandingPage.tsx`:
+  - Standalone size selector pills with dynamic price badges.
+  - Synchronized serving capacity indicators.
+  - Variant-aware cart addition and sticky checkout action.
+
+---
+
+### Step 7: Checkout & Kitchen Flows
+- Updated `src/components/checkout/CheckoutModal.tsx`:
+  - Mapped `variantId`, `variantName`, and `servingInfo` to each `OrderItem`.
+  - Rendered size variant and serving capacity in the order summary item list.
+- Updated `src/components/checkout/OrderSuccessModal.tsx`:
+  - Included variant names in generated WhatsApp message.
+- Updated `src/components/kitchen/KitchenTicket.tsx`:
+  - Thermal print iframe renders `item.variantName` and `item.servingInfo`.
+  - Updated brand title to "هشوشة للبابكا الحرفية والمخبوزات الفاخرة".
+  - On-screen modal displays variant name and serving info.
+- Updated `src/components/kitchen/OrderDetailsDrawer.tsx` & `OrdersPipeline.tsx`:
+  - Rendered variant names on kitchen order cards and details drawer.
+
+---
+
+### Step 8: Admin Product Edit Modal
+- Updated `src/components/admin/modules/ProductEditModal.tsx`:
+  - Added "تفعيل خيارات الأحجام المتعددة (Multi-Size Variants)" toggle.
+  - Added interactive table to add, edit, and delete variants (`name`, `price`, `servingInfo`, `inStock`).
+  - Persisted `variants` array to Supabase via `saveDishToSupabase`.
+
+---
+
+### Step 9: Verification & Quality Gate
+- Ran full build pipeline:
+  ```bash
+  npm run build
+  ```
+- Result: **Passed with Exit Code 0 in 56.65s**. Zero TypeScript errors. All 2033 modules transformed successfully.

@@ -1,0 +1,34 @@
+# EXECUTION LOG — TASK-012: Rich Product Page, Culinary Showcase & Interactive Conversion Engine
+
+> **Task ID:** `TASK-012-rich-product-page-and-interactive-showcase`  
+> **Phase:** Phase C (Implementation Trace)  
+> **Implementer:** Agent Beta (Senior Full-Stack Implementer)  
+> **Start Time:** 2026-10-05T20:34:00Z  
+> **Completion Time:** 2026-10-05T21:27:00Z  
+
+---
+
+## Chronological Action Trace
+
+- **[20:34:00] Phase B Approved & Mobilized**: Documented `SKILLS_USED.md` mobilizing `storefront-best-practices`, `tailwind-design-system`, `design-mobile-apps`, and `vercel-react-best-practices`.
+- **[20:34:20] Domain Model Extension**: Updated `src/types/menu.ts` to add `longDescription?: string` and `servingInfo?: string` to `Dish` interface.
+- **[20:34:50] Catalog Storytelling Hydration**: Enriched `src/data/menu.ts` with authentic artisanal culinary narratives and banquet serving metrics for all signature dishes.
+- **[20:35:10] Supabase Cloud Mapping**: Updated `src/services/adminService.ts` mapping `long_description` and `serving_info` into `fetchDishesFromSupabase` and `saveDishToSupabase`.
+- **[20:36:10] Standalone Product Page Overhaul**: Updated `src/components/storefront/v0/ProductLandingPage.tsx`:
+  - Added serving capacity pill (`Users` icon) next to price & unit.
+  - Added culinary craft storytelling card (`Sparkles` icon) with `longDescription`.
+  - Added hotel-grade presentation tip (`UtensilsCrossed` icon).
+  - Replaced generic quality cards with 4 Royal Hospitality Guarantees (`طهي طازج يومياً`, `توصيل مجهز ومبرد`, `تغليف الضيافة والإهداء`, `ضمان الذائقة الفاخرة`).
+  - Added Verified Riyadh Customer Reviews section (⭐ 4.9 summary with 3 testimonials from Al-Narjis, Hittin, and Al-Malqa with `CheckCircle2` verified badge).
+  - Added "يكمل جمعتكم" complementary dishes section with 1-click cart addition.
+- **[20:37:50] In-Store Quick-View Modal Expansion**: Updated `src/components/storefront/v0/ProductDetailModal.tsx`:
+  - Added serving capacity pill (`Users` icon) in price row.
+  - Added rich culinary story and hospitality presentation tips.
+  - Preserved mobile scroll ergonomics and fixed action footer.
+- **[20:39:00] Merchant Center Integration**: Updated `src/components/admin/modules/ProductEditModal.tsx` adding form inputs for `servingInfo` and `longDescription`.
+- **[20:39:30] Initial Compilation Check**: Caught and cleaned 2 unused Lucide icon imports (`ShieldCheck`, `HeartHandshake`).
+- **[21:05:00] Founder Feedback & Refinements**:
+  - **Unit Badge Contrast Fix**: Replaced dark transparent overlay with high-contrast luxury linen pill (`bg-[#fdfbf7]/95 text-[#2e1e0d] border border-[#9e774c]/40 shadow-md font-bold text-[11px]`) on dish image and added subtitle metric under price.
+  - **DishCard Stepper Parity**: Replaced simple button with full `DishCard`-style tactile stepper (`AnimatePresence`, spring physics, `+` and `-` buttons).
+  - **OrderBar Route Integration**: Integrated `OrderBar` into `isDishLandingRoute` in `src/App.tsx` and added `pb-32 sm:pb-36` bottom padding in `ProductLandingPage.tsx` so the floating cart appears instantly upon adding any dish.
+- **[21:26:52] Final Build Verification**: `npm run build` executed and exited with code 0 (zero TypeScript errors, zero CSS issues).

@@ -1,0 +1,1054 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تقرير التدقيق الهندسي وخطة التحول الرقمي — متجر هشوشة الفاخر</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --olive-950: #0E2214;
+      --olive-900: #173420;
+      --olive-800: #21492E;
+      --olive-700: #2D5E3B;
+      --olive-600: #3E7A4F;
+      --olive-100: #E3EFE6;
+      --olive-50: #F3F8F4;
+      
+      --pomegranate-900: #580B19;
+      --pomegranate-700: #9B132B;
+      --pomegranate-600: #BE1835;
+      --pomegranate-500: #DC2643;
+      --pomegranate-100: #FCE4E8;
+      --pomegranate-50: #FDF2F4;
+
+      --honey-800: #784B07;
+      --honey-600: #C47D0B;
+      --honey-500: #E59B18;
+      --honey-100: #FDF0D4;
+      --honey-50: #FEF9EE;
+
+      --surface-warm: #FDFBF7;
+      --surface-card: #FFFFFF;
+      --surface-muted: #F6F2E9;
+      --surface-border: #E5DFD3;
+
+      --text-main: #1C1917;
+      --text-muted: #57534E;
+      --text-light: #78716C;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Page Setup */
+    @page {
+      size: A4 portrait;
+      margin: 0; /* Suppresses browser URL, timestamp, and default header/footers */
+    }
+
+    body {
+      font-family: 'Readex Pro', 'Cairo', system-ui, sans-serif;
+      background-color: #DED7CB;
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 30px 0;
+      -webkit-font-smoothing: antialiased;
+      direction: rtl;
+    }
+
+    /* Floating Print Button */
+    .print-bar {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background: rgba(23, 52, 32, 0.95);
+      backdrop-filter: blur(12px);
+      padding: 10px 24px;
+      border-radius: 9999px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .print-btn {
+      background: linear-gradient(135deg, var(--pomegranate-600), var(--pomegranate-700));
+      color: white;
+      border: none;
+      padding: 9px 20px;
+      border-radius: 9999px;
+      font-family: 'Cairo', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px rgba(190, 24, 53, 0.35);
+    }
+
+    .print-btn:hover {
+      transform: scale(1.02);
+      background: linear-gradient(135deg, var(--pomegranate-500), var(--pomegranate-600));
+    }
+
+    .print-hint {
+      color: #E2E8F0;
+      font-size: 12.5px;
+    }
+
+    /* Discrete A4 Pages Container */
+    .page-sheet {
+      width: 210mm;
+      height: 296.5mm; /* Exact standard A4 */
+      margin: 0 auto 25px auto;
+      background: var(--surface-warm);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 14mm 16mm 12mm 16mm;
+      page-break-after: always;
+      break-after: page;
+      box-sizing: border-box;
+    }
+
+    /* Page Running Header & Footer */
+    .page-header-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--surface-border);
+      padding-bottom: 7px;
+      margin-bottom: 14px;
+      font-size: 11px;
+      color: var(--text-light);
+    }
+
+    .page-header-strip .brand {
+      font-family: 'Cairo', sans-serif;
+      font-weight: 700;
+      color: var(--olive-900);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .page-header-strip .doc-type {
+      color: var(--olive-700);
+      font-weight: 600;
+    }
+
+    .page-footer-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--surface-border);
+      padding-top: 7px;
+      margin-top: 12px;
+      font-size: 10.5px;
+      color: var(--text-light);
+    }
+
+    .page-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Typography & Core Styles */
+    h1, h2, h3, h4 {
+      font-family: 'Cairo', sans-serif;
+    }
+
+    .section-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      margin-bottom: 8px;
+    }
+
+    .tag-danger {
+      background: var(--pomegranate-50);
+      color: var(--pomegranate-700);
+      border: 1px solid var(--pomegranate-100);
+    }
+
+    .tag-success {
+      background: var(--olive-50);
+      color: var(--olive-800);
+      border: 1px solid var(--olive-100);
+    }
+
+    .tag-accent {
+      background: var(--honey-50);
+      color: var(--honey-800);
+      border: 1px solid var(--honey-100);
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--olive-950);
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+
+    .section-desc {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    /* PAGE 1 STYLES */
+    .cover-hero {
+      background: linear-gradient(135deg, var(--olive-950) 0%, var(--olive-900) 65%, var(--olive-800) 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 26px 28px;
+      position: relative;
+      margin-bottom: 18px;
+      border: 1px solid var(--olive-700);
+      box-shadow: 0 4px 16px rgba(14, 34, 20, 0.15);
+    }
+
+    .cover-emblem {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      padding: 4px 14px;
+      border-radius: 9999px;
+      font-size: 11.5px;
+      color: var(--honey-100);
+      margin-bottom: 14px;
+      font-weight: 600;
+    }
+
+    .cover-title {
+      font-size: 27px;
+      font-weight: 900;
+      line-height: 1.3;
+      margin-bottom: 8px;
+      color: #FFFFFF;
+    }
+
+    .cover-subtitle {
+      font-size: 13px;
+      color: #D1DFD5;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+
+    .cover-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .cover-meta-box {
+      background: rgba(0, 0, 0, 0.22);
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .cover-meta-box .lbl {
+      font-size: 10px;
+      color: #A3BFAB;
+      margin-bottom: 2px;
+    }
+
+    .cover-meta-box .val {
+      font-size: 12px;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    .letter-card {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: 14px;
+      padding: 22px 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+
+    .letter-greeting {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--olive-900);
+      margin-bottom: 10px;
+    }
+
+    .letter-text {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.8;
+      text-align: justify;
+    }
+
+    .letter-highlight {
+      font-weight: 700;
+      color: var(--olive-950);
+      background: var(--olive-50);
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+
+    .letter-pillars {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--surface-border);
+    }
+
+    .pillar-box {
+      background: var(--surface-muted);
+      border-radius: 10px;
+      padding: 10px 12px;
+      text-align: center;
+    }
+
+    .pillar-box .icon {
+      font-size: 18px;
+      margin-bottom: 3px;
+    }
+
+    .pillar-box .title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--olive-900);
+    }
+
+    .pillar-box .desc {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+
+    /* PAGE 2 STYLES: Diagnostic Issues */
+    .issue-card-compact {
+      background: var(--surface-card);
+      border: 1px solid #EFE4E6;
+      border-right: 4px solid var(--pomegranate-600);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      break-inside: avoid;
+    }
+
+    .issue-card-compact:last-child {
+      margin-bottom: 0;
+    }
+
+    .issue-num-badge {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--pomegranate-100);
+      color: var(--pomegranate-700);
+      font-family: 'Cairo', sans-serif;
+      font-weight: 800;
+      font-size: 12.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .issue-compact-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--pomegranate-900);
+      margin-bottom: 2px;
+    }
+
+    .issue-compact-text {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .issue-compact-impact {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--pomegranate-600);
+      margin-top: 4px;
+      display: block;
+    }
+
+    /* PAGE 3 STYLES: Modern Transformation Features */
+    .features-grid-page3 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-gap: 12px;
+      flex: 1;
+    }
+
+    .feature-card-compact {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-top: 3px solid var(--olive-700);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      break-inside: avoid;
+    }
+
+    .feature-card-compact .top-info {
+      margin-bottom: 8px;
+    }
+
+    .feature-card-compact .icon {
+      font-size: 22px;
+      margin-bottom: 4px;
+      display: inline-block;
+    }
+
+    .feature-card-compact .title {
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--olive-950);
+      margin-bottom: 4px;
+    }
+
+    .feature-card-compact .text {
+      font-size: 11.8px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .feature-card-compact .gain-pill {
+      background: var(--olive-50);
+      color: var(--olive-800);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      align-self: flex-start;
+      border: 1px solid var(--olive-100);
+    }
+
+    /* PAGE 4 STYLES: Comparison Table & ROI */
+    .table-container {
+      border: 1px solid var(--surface-border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 14px;
+      background: var(--surface-card);
+    }
+
+    .report-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: right;
+    }
+
+    .report-table th {
+      font-family: 'Cairo', sans-serif;
+      padding: 8px 12px;
+      font-size: 11.5px;
+      font-weight: 800;
+    }
+
+    .report-table .th-c {
+      background: #F5F1E8;
+      width: 22%;
+    }
+
+    .report-table .th-o {
+      background: #FDF1F3;
+      color: var(--pomegranate-700);
+      width: 39%;
+      border-right: 1px solid var(--surface-border);
+    }
+
+    .report-table .th-n {
+      background: #EDF6EF;
+      color: var(--olive-800);
+      width: 39%;
+      border-right: 1px solid var(--surface-border);
+    }
+
+    .report-table td {
+      padding: 7px 12px;
+      font-size: 11px;
+      line-height: 1.45;
+      border-top: 1px solid var(--surface-border);
+      vertical-align: top;
+    }
+
+    .report-table .td-c {
+      font-weight: 700;
+      color: var(--text-main);
+      background: #FAF8F2;
+    }
+
+    .report-table .td-o {
+      color: #7A353F;
+      border-right: 1px solid var(--surface-border);
+      background: #FFFAFB;
+    }
+
+    .report-table .td-n {
+      color: var(--olive-950);
+      font-weight: 500;
+      border-right: 1px solid var(--surface-border);
+      background: #FAFCFA;
+    }
+
+    .roi-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .roi-box-compact {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      text-align: center;
+    }
+
+    .roi-box-compact .num {
+      font-family: 'Cairo', sans-serif;
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--olive-800);
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+
+    .roi-box-compact .lbl {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 2px;
+    }
+
+    .roi-box-compact .desc {
+      font-size: 9.5px;
+      color: var(--text-muted);
+      line-height: 1.25;
+    }
+
+    .strategic-summary-box {
+      background: linear-gradient(135deg, var(--olive-950), var(--olive-900));
+      color: white;
+      padding: 14px 18px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+
+    .strategic-summary-box .title {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: var(--honey-400, #F3BA49);
+      margin-bottom: 4px;
+    }
+
+    .strategic-summary-box .text {
+      font-size: 11.5px;
+      color: #E2ECE5;
+      line-height: 1.6;
+    }
+
+    .official-sign-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: 10px;
+      padding: 10px 16px;
+    }
+
+    .official-sign-box .stamp {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .official-sign-box .badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--olive-100);
+      color: var(--olive-800);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 16px;
+    }
+
+    .official-sign-box .text-area strong {
+      font-size: 11.5px;
+      color: var(--olive-900);
+      display: block;
+    }
+
+    .official-sign-box .text-area span {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    /* Print Specific Rules */
+    @media print {
+      body {
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      .print-bar {
+        display: none !important;
+      }
+
+      .page-sheet {
+        margin: 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        width: 100% !important;
+        height: 100vh !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Print Action -->
+  <div class="print-bar">
+    <button class="print-btn" onclick="window.print()">
+      <span>🖨️</span>
+      <span>حفظ كملف PDF / طباعة التقرير</span>
+    </button>
+    <span class="print-hint">تم ضبط الهوامش لإلغاء أي نصوص متصفح إضافية تلقائياً</span>
+  </div>
+
+  <!-- ==========================================
+       PAGE 1: الغلاف والرسالة التنفيذية
+       ========================================== -->
+  <div class="page-sheet">
+    <!-- Header Strip -->
+    <div class="page-header-strip">
+      <div class="brand">
+        <span>🌿</span>
+        <span>هشوشة للمحاشي والحلويات الفاخرة</span>
+      </div>
+      <div class="doc-type">وثيقة استراتيجية للإدارة العليا • الرياض</div>
+    </div>
+
+    <!-- Main Page Content -->
+    <div class="page-content">
+      <!-- Cover Banner -->
+      <div class="cover-hero">
+        <div class="cover-emblem">
+          <span>🌿</span>
+          <span>هشوشة للمحاشي والحلويات الفاخرة | وثيقة الإدارة العليا</span>
+        </div>
+        <h1 class="cover-title">تقرير التدقيق الهندسي وخطة التحول الرقمي الشامل</h1>
+        <p class="cover-subtitle">
+          دراسة مقارنة تحليلية توضح أسباب تسرب المبيعات في المتجر السابق، واستعراض خطة التطوير والمواصفات المستهدفة للنظام الجديد لمضاعفة الأرباح وتيسير إدارة المبيعات.
+        </p>
+
+        <div class="cover-meta-grid">
+          <div class="cover-meta-box">
+            <div class="lbl">إلى عناية</div>
+            <div class="val">صاحب العمل / الإدارة</div>
+          </div>
+          <div class="cover-meta-box">
+            <div class="lbl">الجهة المُعدّة</div>
+            <div class="val">Agent Alpha (كبير المهندسين)</div>
+          </div>
+          <div class="cover-meta-box">
+            <div class="lbl">نطاق التغطية</div>
+            <div class="val">مدينة الرياض — المملكة</div>
+          </div>
+          <div class="cover-meta-box">
+            <div class="lbl">طبيعة الوثيقة</div>
+            <div class="val" style="color: #F8D377;">خطة تطوير مستهدفة</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Executive Letter -->
+      <div class="letter-card">
+        <div>
+          <h2 class="letter-greeting">سعادة الشريك المؤسس / مالك متجر هشوشة المحترم،</h2>
+          <p class="letter-text">
+            يسرّنا أن نضع بين أيديكم هذه الوثيقة الاستراتيجية الشاملة. لقد قمنا أولاً بتفكيك وتدقيق كامل الشفرات البرمجية وتجربة العميل في متجركم الإلكتروني السابق (<span class="letter-highlight">المتجر القديم: سر اللفة</span>)، ليس بهدف النقد النظري، بل لتحديد <span class="letter-highlight">مواطن الهدر المالي وفرص المبيعات الضائعة</span> التي كان يتعرض لها مشروعكم.
+            <br><br>
+            إن قطاع الأطعمة الفاخرة (محاشي ورق العنب، الملفوف الدايب، والحلويات الشرقية) يقوم أساساً على مبدأ <strong>"العين تعشق وتشتهي قبل الفم"</strong>. ولأن 85% من زبائنكم في الرياض يطلبون عبر الجوال وتطبيق الواتساب، فإننا نستعرض معكم في هذا التقرير <span class="letter-highlight">خطة البناء الشاملة التي سننفذها من الصفر</span> ليصبح متجركم ماكينة مبيعات سريعة وسلسة تجعل المشتري يُتم طلبه في أقل من 30 ثانية بدون أي تعقيد.
+          </p>
+        </div>
+
+        <div class="letter-pillars">
+          <div class="pillar-box">
+            <div class="icon">✨</div>
+            <div class="title">إثارة الشهية والجاذبية</div>
+            <div class="desc">واجهة ذواقة تبرز جودة ونظافة طعامكم الفاخر</div>
+          </div>
+          <div class="pillar-box">
+            <div class="icon">📈</div>
+            <div class="title">رفع قيمة الفاتورة</div>
+            <div class="desc">محرك خيارات وأحجام يرفع متوسط السلة +35%</div>
+          </div>
+          <div class="pillar-box">
+            <div class="icon">⚡</div>
+            <div class="title">السرعة والراحة</div>
+            <div class="desc">طلب فوري منظم يختصر وقت الدردشة بالكامل</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Strip -->
+    <div class="page-footer-strip">
+      <span>تقرير التدقيق والتحول الرقمي • متجر هشوشة الفاخر</span>
+      <span>صفحة 1 من 4</span>
+    </div>
+  </div>
+
+
+  <!-- ==========================================
+       PAGE 2: تشخيص المتجر السابق (5 معوقات)
+       ========================================== -->
+  <div class="page-sheet">
+    <!-- Header Strip -->
+    <div class="page-header-strip">
+      <div class="brand">
+        <span>🌿</span>
+        <span>هشوشة للمحاشي والحلويات الفاخرة</span>
+      </div>
+      <div class="doc-type">المرحلة الأولى: التشخيص الهندسي وحصر السلبيات السابقة</div>
+    </div>
+
+    <!-- Main Page Content -->
+    <div class="page-content">
+      <span class="section-tag tag-danger">المرحلة الأولى: التشخيص الفعلي</span>
+      <h2 class="section-title">5 معوقات في المتجر السابق كانت تتسبب في ضياع الزبائن</h2>
+      <p class="section-desc">
+        تحليل واقعي يوضح لماذا كان يدخل الزائر إلى المتجر ثم يغادر دون إتمام الطلب، أو يرهق فريق عملكم باستفسارات طويلة قبل الشراء:
+      </p>
+
+      <!-- Issue 1 -->
+      <div class="issue-card-compact">
+        <div class="issue-num-badge">1</div>
+        <div>
+          <h3 class="issue-compact-title">غياب الهوية والجاذبية البصرية (انعدام إثارة الشهية)</h3>
+          <p class="issue-compact-text">
+            كان المتجر القديم يستخدم واجهات رمادية باهتة وألواناً باردة تشبه المتاجر العامة أو الإلكترونيات، ولا تعكس نهائياً روعة ولمعان دبس الرمان أو دفء السمن البلدي وحبات ورق العنب الملفوفة بعناية. هذا المظهر غير الشهي كان يقلل من قيمة العلامة في ذهن الزبون مقارنة بمطاعم الرياض المنافسة.
+          </p>
+          <span class="issue-compact-impact">📉 الأثر التجاري: انخفاض الرغبة في الشراء الفوري وتراجع الثقة في جودة المنتج.</span>
+        </div>
+      </div>
+
+      <!-- Issue 2 -->
+      <div class="issue-card-compact">
+        <div class="issue-num-badge">2</div>
+        <div>
+          <h3 class="issue-compact-title">انعدام محرك الخيارات والتخصيص (الحرمان من زيادة الفاتورة)</h3>
+          <p class="issue-compact-text">
+            في المتجر السابق، لم يكن بإمكان الزبون اختيار حجم الصحن (صغير / عائلي / صينية مناسبات)، ولا تحديد درجة الشطة (عادي / سبايسي)، ولا طلب إضافات مدفوعة (مثل دبس رمان زيادة، صوص طحينة، أو بصل مقرمش). كان الطبق معروضاً كقطعة واحدة صلبة!
+          </p>
+          <span class="issue-compact-impact">📉 الأثر التجاري: حرمان المتجر من زيادة متوسط قيمة سلة الشراء (AOV) بنسبة تفوق 30% عبر البيع التكميلي.</span>
+        </div>
+      </div>
+
+      <!-- Issue 3 -->
+      <div class="issue-card-compact">
+        <div class="issue-num-badge">3</div>
+        <div>
+          <h3 class="issue-compact-title">عشوائية رسائل الواتساب وتشتت فريق المبيعات</h3>
+          <p class="issue-compact-text">
+            عند ضغط الزبون على "اطلب عبر الواتس" سابقاً، كانت تصله رسالة ناقصة لا تتضمن: اسم الزبون، رقم هاتفه البديل، الحي وعنوان التوصيل في الرياض، أو تفاصيل النكهات. وكان الموظف يضطر لكتابة استفسارات متكررة عبر الدردشة، مما يستهلك وقتاً طويلاً ويزيد احتمالية تراجع الزبون وإلغاء الطلب.
+          </p>
+          <span class="issue-compact-impact">📉 الأثر التجاري: ضياع ساعات عمل يومية، تأخر تجهيز طلبات المطبخ، وانسحاب زبائن مستعجلين.</span>
+        </div>
+      </div>
+
+      <!-- Issue 4 -->
+      <div class="issue-card-compact">
+        <div class="issue-num-badge">4</div>
+        <div>
+          <h3 class="issue-compact-title">أخطاء برمجية خفية في سلة المشتريات</h3>
+          <p class="issue-compact-text">
+            أظهر الفحص البرمجي للكود السابق وجود تعارض بين مسميات المنتجات في الصفحة الرئيسية وسلة التسوق، مما كان يتسبب في بعض الأحيان بظهور أطباق بدون مسميات أو تعطل زر الإضافة عند تحديث الصفحة، وهو ما يخيف الزبون ويشعره بأن الموقع غير آمن أو معطل.
+          </p>
+          <span class="issue-compact-impact">📉 الأثر التجاري: ترك الزبون للسلة والشراء من متجر منافس فور مواجهة أي خطأ تقني.</span>
+        </div>
+      </div>
+
+      <!-- Issue 5 -->
+      <div class="issue-card-compact">
+        <div class="issue-num-badge">5</div>
+        <div>
+          <h3 class="issue-compact-title">صعوبة وبطء الإدارة والتحكم لصاحب المتجر</h3>
+          <p class="issue-compact-text">
+            كانت لوحة التحكم القديمة تتطلب تسجيل دخول معقد عبر خادم خارجي بطيء، ولا تمكّن صاحب العمل من جواله من وضع علامة سريعة بأن الصنف "نفذ من المطبخ" أو تعديل رقم جوال الواتساب المستلم دون الاستعانة بمبرمج خارجي!
+          </p>
+          <span class="issue-compact-impact">📉 الأثر التجاري: بيع أصناف غير متوفرة مما يحرج الإدارة أمام الزبائن ويضطرها للاعتذار وإرجاع الحوالات.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Strip -->
+    <div class="page-footer-strip">
+      <span>تقرير التدقيق والتحول الرقمي • متجر هشوشة الفاخر</span>
+      <span>صفحة 2 من 4</span>
+    </div>
+  </div>
+
+
+  <!-- ==========================================
+       PAGE 3: ما سيتم بناؤه في متجر هشوشة (الحلول)
+       ========================================== -->
+  <div class="page-sheet">
+    <!-- Header Strip -->
+    <div class="page-header-strip">
+      <div class="brand">
+        <span>🌿</span>
+        <span>هشوشة للمحاشي والحلويات الفاخرة</span>
+      </div>
+      <div class="doc-type">المرحلة الثانية: المواصفات الهندسية للنظام الجديد</div>
+    </div>
+
+    <!-- Main Page Content -->
+    <div class="page-content">
+      <span class="section-tag tag-success">المرحلة الثانية: الحلول الهندسية وخطة التطوير المستهدفة</span>
+      <h2 class="section-title">متجر "هشوشة" الجديد: ما سنبنيه لتحقيق قفزة نوعية في المبيعات</h2>
+      <p class="section-desc">
+        سيتم بناء المنصة الجديدة بالكامل وفق أحدث المعايير التقنية العالمية المتبعة في كبرى منصات الأغذية، مع تخصيص فائق للثقافة السعودية وذائقة أهل الرياض:
+      </p>
+
+      <div class="features-grid-page3">
+        <!-- Feature 1 -->
+        <div class="feature-card-compact">
+          <div class="top-info">
+            <span class="icon">🌿</span>
+            <h3 class="title">واجهة ذواقة ستخطف الأبصار</h3>
+            <p class="text">
+              سنعتمد نظام ألوان ملكي دافئ مستوحى من ورق العنب الأخضر النضر، وروبي دبس الرمان، والذهب العسلي، مع خلفيات عاجية دافئة تريح العين وتبرز شهية الأطباق بأعلى دقة.
+            </p>
+          </div>
+          <span class="gain-pill">الهدف: زيادة زمن تصفح الزبون بنسبة 60%</span>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="feature-card-compact">
+          <div class="top-info">
+            <span class="icon">✨</span>
+            <h3 class="title">محرك ذكي للخيارات والإضافات</h3>
+            <p class="text">
+              سنقوم ببرمجة نافذة تفاعلية منبثقة بنقرة واحدة تتيح للزبون تحديد: (حجم البوكس، درجة السبايسي، وإضافات الصوصات مثل دبس الرمان المركز أو صوص الطحينة) مع احتساب فوري للسعر.
+            </p>
+          </div>
+          <span class="gain-pill">الهدف: رفع متوسط الفاتورة بنسبة تفوق 30%</span>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="feature-card-compact">
+          <div class="top-info">
+            <span class="icon">🛵</span>
+            <h3 class="title">فاتورة الواتساب الفورية الذاتية</h3>
+            <p class="text">
+              سنطور مولداً آلياً يُنشئ رسالة باللغة العربية فائقة التنسيق والإيموجي تحتوي على (رقم طلب مميز، اسم العميل، عنوان التوصيل بدقة، تفاصيل الأحجام والإضافات، وإجمالي الفاتورة مع التوصيل).
+            </p>
+          </div>
+          <span class="gain-pill">الهدف: إلغاء 100% من محادثات الاستفسار الروتينية</span>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="feature-card-compact">
+          <div class="top-info">
+            <span class="icon">⚡</span>
+            <h3 class="title">سلة شراء ستفتح بسلاسة من الأسفل</h3>
+            <p class="text">
+              سنبني سلة شراء تفاعلية عائمة تظهر للزبون دون الحاجة لتغيير الصفحة، وستحفظ محتويات السلة في هاتف الزبون حتى لو أغلق المتصفح وعاد لاحقاً، مع شريط دفع ثابت ومريح للإبهام.
+            </p>
+          </div>
+          <span class="gain-pill">الهدف: تقليل هجر السلة بنسبة 45%</span>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="feature-card-compact">
+          <div class="top-info">
+            <span class="icon">📱</span>
+            <h3 class="title">لوحة تحكم خفيفة وسريعة من الجوال</h3>
+            <p class="text">
+              سنوفر لوحة إدارة فائقة السهولة مصممة لصاحب المتجر؛ ستتيح له بلمسة زر إيقاف أي صنف نفذت كميته، تعديل الأسعار، أو تغيير رقم هاتف الواتساب فوراً وبدون الحاجة لمبرمج.
+            </p>
+          </div>
+          <span class="gain-pill">الهدف: تحكم فوري ومرن أثناء ضغط العمل</span>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="feature-card-compact">
+          <div class="top-info">
+            <span class="icon">🛡️</span>
+            <h3 class="title">استقلالية تامة وسرعة استثنائية</h3>
+            <p class="text">
+              سنستغني تماماً عن الخوادم الخارجية المعقدة بالاعتماد على منظومة مستقلة سريعة ستعمل بكفاءة حتى في أضعف شبكات الجوال دون انقطاع، مع ضمان استقرار المتجر بنسبة 100%.
+            </p>
+          </div>
+          <span class="gain-pill">الهدف: فتح فوري للموقع في أقل من ثانية واحدة</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Strip -->
+    <div class="page-footer-strip">
+      <span>تقرير التدقيق والتحول الرقمي • متجر هشوشة الفاخر</span>
+      <span>صفحة 3 من 4</span>
+    </div>
+  </div>
+
+
+  <!-- ==========================================
+       PAGE 4: المقارنة الشاملة والأثر المالي والختام
+       ========================================== -->
+  <div class="page-sheet">
+    <!-- Header Strip -->
+    <div class="page-header-strip">
+      <div class="brand">
+        <span>🌿</span>
+        <span>هشوشة للمحاشي والحلويات الفاخرة</span>
+      </div>
+      <div class="doc-type">المرحلة الثالثة والرابعة: جدول الفروقات والعائد التجاري المتوقع</div>
+    </div>
+
+    <!-- Main Page Content -->
+    <div class="page-content">
+      <span class="section-tag tag-accent">المرحلة الثالثة: المقارنة المباشرة وخريطة التطوير</span>
+      <h2 class="section-title">جدول الفروقات الشامل: الوضع السابق ❌ مقابل ما سيتم بناؤه في هشوشة ✅</h2>
+
+      <!-- Table -->
+      <div class="table-container">
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th class="th-c">وجه المقارنة</th>
+              <th class="th-o">المتجر السابق (سر اللفة) ❌</th>
+              <th class="th-n">المواصفات المستهدفة في متجر هشوشة الجديد ✅</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-c">الهوية والشهية</td>
+              <td class="td-o">❌ هوية رمادية باردة لا تعكس طزاجة ورق العنب أو فخامة الحلويات.</td>
+              <td class="td-n">✅ سيتم تصميم هوية ذواقة مترفة بألوان زيتونية ودبس رمان وعسل يفتح الشهية.</td>
+            </tr>
+            <tr>
+              <td class="td-c">التوافق مع الجوال</td>
+              <td class="td-o">❌ بطء نسبي واعتماد على خوادم وقواعد بيانات خارجية قد تتعطل.</td>
+              <td class="td-n">✅ سيكون صاروخياً ومصمماً للإبهام بنسبة 100% وبسرعة تحميل خيالية.</td>
+            </tr>
+            <tr>
+              <td class="td-c">خيارات الأطباق</td>
+              <td class="td-o">❌ صنف ثابت واحد دون أحجام أو صواني مناسبات أو درجات سبايسي.</td>
+              <td class="td-n">✅ سيتضمن محرك تخصيص متكامل (بوكس 25 / 50 / صينية 100 حبة) وصوصات مدفوعة.</td>
+            </tr>
+            <tr>
+              <td class="td-c">طلبات الواتساب</td>
+              <td class="td-o">❌ رسالة مبهمة بدون اسم المشتري أو عنوانه مما يضيع الوقت في الدردشة.</td>
+              <td class="td-n">✅ سيولد أمر تشغيل وطباعة فوري كالفاتورة بالاسم والعنوان جاهزاً للمطبخ والسائق فوراً.</td>
+            </tr>
+            <tr>
+              <td class="td-c">لوحة التحكم</td>
+              <td class="td-o">❌ معقدة وغير مرنة ولا تمكنك بسهولة من إيقاف صنف نفذت كميته.</td>
+              <td class="td-n">✅ ستمنحك تحكماً فورياً بلمسة زر لفتح/إغلاق الطلبات وتعديل الأصناف من الجوال.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ROI Section -->
+      <span class="section-tag tag-success">المرحلة الرابعة: العائد الاقتصادي والأثر المالي المتوقع (ROI)</span>
+      <div class="roi-strip">
+        <div class="roi-box-compact">
+          <div class="num">+35%</div>
+          <div class="lbl">ارتفاع متوقع في الفاتورة</div>
+          <div class="desc">بفضل محرك خيارات الأحجام والصوصات المقترحة في السلة.</div>
+        </div>
+        <div class="roi-box-compact">
+          <div class="num">80%</div>
+          <div class="lbl">توفير في وقت خدمة العملاء</div>
+          <div class="desc">الرسالة تصل جاهزة بالمواصفات والعنوان؛ وداعاً للاستفسارات المتكررة.</div>
+        </div>
+        <div class="roi-box-compact">
+          <div class="num">99.9%</div>
+          <div class="lbl">استقرار وموثوقية النظام</div>
+          <div class="desc">تصفح مستقر وفوري بدون أي انقطاع حتى في أضعف شبكات الجوال.</div>
+        </div>
+      </div>
+
+      <!-- Strategic Summary -->
+      <div class="strategic-summary-box">
+        <div class="title">خلاصة الرؤية الاستراتيجية لخطة العمل:</div>
+        <p class="text">
+          إن ما نخطط لبنائه في متجر <strong>"هشوشة"</strong> ليس مجرد موقع لعرض الصور، بل هو <strong>تأسيس لواجهة ضيافة إلكترونية متطورة</strong> تحترم ذائقة العميل السعودي وتمنحه الثقة في أن ما سيصل إلى مائدته هو طعام مُعد بإتقان ونظافة وشغف. مع هذا النظام، نضمن لكم تحويل كل زائر لصفحتكم إلى عميل دائم يكرر طلبه في كل جمعة ومناسبة عائلية.
+        </p>
+      </div>
+
+      <!-- Official Sign-off -->
+      <div class="official-sign-box">
+        <div class="stamp">
+          <div class="badge">✓</div>
+          <div class="text-area">
+            <strong>وثيقة خطة التحول والتطوير المستهدفة • معتمدة للمناقشة والتنفيذ</strong>
+            <span>فريق التصميم والتطوير الهندسي — متجر هشوشة الفاخر</span>
+          </div>
+        </div>
+        <div style="text-align: left; font-size: 10px; color: #94A3B8; direction: ltr;">
+          HASHOUSHA • EXECUTIVE PLAN V2.0 • RIYADH
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Strip -->
+    <div class="page-footer-strip">
+      <span>تقرير التدقيق والتحول الرقمي • متجر هشوشة الفاخر</span>
+      <span>صفحة 4 من 4</span>
+    </div>
+  </div>
+
+</body>
+</html>

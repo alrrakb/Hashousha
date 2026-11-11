@@ -1,0 +1,60 @@
+# Execution Log: TASK-020 — Full Storefront Micro-Copy Democratization
+
+> **Task ID:** `TASK-020-full-storefront-micro-copy-democratization`  
+> **Milestone:** Milestone 16 — Comprehensive Storefront Micro-Copy Democratization & CMS Expansion  
+> **Authority:** Agent Alpha (Lead Software Architect & Creative Director)  
+> **Executor:** Agent Beta (Senior Full-Stack Implementer)  
+> **Started:** 2026-10-09T08:44:00+03:00  
+> **Completed:** 2026-10-09T08:57:30+03:00  
+
+---
+
+## Chronological Action Trace
+
+- [2026-10-09 08:44:05] **Phase A audit verified**. Read and triaged `tasks/TASK-020-full-storefront-micro-copy-democratization/SPEC.md`.
+- [2026-10-09 08:44:40] **Phase B complete**. Mobilized skills `storefront-best-practices` and `tailwind-design-system`. Created `tasks/TASK-020-full-storefront-micro-copy-democratization/SKILLS_USED.md`.
+- [2026-10-09 08:45:00] **Phase C started**.
+- [2026-10-09 08:46:10] **Registry Expansion (`src/types/admin.ts`)**:
+  - Expanded `DEFAULT_UI_STRINGS` from 28 keys to 66 keys.
+  - Added micro-copy keys for:
+    - Cart modal & drawers (`cartCouponAppliedSuccess`, `cartAppliedLabel`)
+    - Customer checkout form (`recipientHeader`, `phoneHelper`, `districtNotice`, `districtSelectDefault`)
+    - Payment selector & order breakdown (`paymentMethodHeader`)
+    - Order success modal (`orderSuccessConfirmedBadge`, `orderSuccessTitle`, `orderSuccessSubtitle`, `orderSuccessNotice`, `orderSuccessSummaryTitle`, `orderSuccessDistrictLabel`, `orderSuccessRecipientLabel`, `orderSuccessPaymentLabel`, `orderSuccessTotalLabel`, `orderSuccessTrackWhatsAppBtn`, `orderSuccessHomeBtn`)
+    - Dish cards (`soldOutBadge`, `unavailableBtn`, `addBtn`)
+    - Product detail modal (`defaultServing`, `aboutTitle`, `servingTipTitle`, `servingTipText`, `highlightFresh`, `highlightIngredients`, `highlightPackaging`, `highlightDelivery`)
+    - Product landing page (`backToCatalog`, `storyTitle`, `servingTipTitle`, `servingTipText`, `deliveryTitle`, `deliveryText`, `reviewsTitle`, `reviewsSubtitle`, `addReviewBtn`, `verifiedBadge`, `pairingsTitle`)
+- [2026-10-09 08:48:30] **CMS Chamber Re-architecture (`src/components/admin/modules/SiteContentModule.tsx`)**:
+  - Re-organized `ADVANCED_GROUPS` into 7 distinct thematic categories:
+    1. سلة المشتريات (Cart Drawer & Modal) - 10 keys
+    2. بيانات العميل والشحن (Customer & Delivery Form) - 13 keys
+    3. الدفع وتلخيص الحساب (Payment & Order Summary) - 13 keys
+    4. شاشة تأكيد ونجاح الطلب (Order Success & Celebration) - 11 keys
+    5. بطاقات الأطباق السريعة (Dish Cards) - 3 keys
+    6. نافذة تفاصيل الطبق (Product Detail Modal) - 8 keys
+    7. صفحة الهبوط الترويجية للطبق (Product Landing Page) - 11 keys
+- [2026-10-09 08:50:20] **UX Search Engine Architecture Upgrade (`SiteContentModule.tsx`)**:
+  - Addressed the real-time search disappearance bug: continuous keystroke evaluation caused matched fields to vanish when characters were edited.
+  - Implemented decoupled search state: `searchInput` (uncommitted typing) vs `appliedSearch` (committed search query).
+  - Implemented `matchedKeysSnapshot: Set<string>` generated exclusively upon clicking "بحث" (Search) or pressing Enter.
+  - Implemented dedicated "بحث" (Search) button with luxury amber accent and "إلغاء البحث" (Reset) button to restore full chamber view.
+  - Snapshot prevents field re-evaluation on value mutation, ensuring rock-solid focus and editing stability.
+- [2026-10-09 08:52:00] **Storefront Consumer Component Integrations**:
+  - `src/components/checkout/CustomerForm.tsx`: Wired `recipientHeader`, `phoneHelper`, `districtNotice`, `districtSelectDefault`.
+  - `src/components/checkout/PaymentSelector.tsx`: Wired `paymentMethodHeader`.
+  - `src/components/checkout/OrderSuccessModal.tsx`: Imported `useSiteContent` and wired all 11 success modal keys.
+  - `src/components/storefront/v0/DishCard.tsx`: Imported `useSiteContent` and wired `soldOutBadge`, `unavailableBtn`, `addBtn`.
+  - `src/components/storefront/v0/ProductDetailModal.tsx`: Wired 8 modal keys (`defaultServing`, `aboutTitle`, `servingTipTitle`, `servingTipText`, highlights).
+  - `src/components/storefront/v0/ProductLandingPage.tsx`: Imported `useSiteContent` and wired all 11 product landing page keys.
+- [2026-10-09 08:55:50] **Compilation & Build Verification**:
+  - Fixed missing icon import `X` in `SiteContentModule.tsx`.
+  - Executed `npm run build` (`tsc && vite build`).
+  - Result: Exit code 0, 2032 modules transformed, 0 TypeScript errors, bundle completed in 41.36s.
+- [2026-10-09 08:57:30] **Phase C concluded successfully**.
+- [2026-10-09 19:18:00] **Universal Search Expansion (Basic + Advanced Texts)**:
+  - Extended search engine scanning in `SiteContentModule.tsx` to include all primary fields in Section 2.1 (Hero: `heroTag`, `heroTitle`, `heroSubtitle`, `heroAlt`, `heroDescription`), Section 2.2 (Pillars 1-4: titles & subtitles), and Section 2.3 (Footer: `footerTitle`, `footerSubtitle`, `deliveryNotice`).
+  - Added snapshot locking, `مطابق للبحث 🔍` badges, gold highlight rings, and section-level match count badges across all primary sections.
+  - Updated notification banner to report matches dynamically across basic texts and advanced settings.
+  - Added dedicated empty search state card when zero matches are found.
+  - Build verified with exit code 0 (25.29s).
+

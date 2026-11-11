@@ -1,0 +1,67 @@
+# Phase C: Execution Trace — TASK-019
+
+> **Task ID:** `TASK-019-storefront-home-dark-mode-refinement`  
+> **Lifecycle Phase:** Phase C (Execution & Verification)  
+> **Implementer:** Agent Beta (Senior Full-Stack Implementer)  
+> **Timestamp:** 2026-10-09T07:33:40+03:00  
+
+---
+
+## Chronological Action Log
+
+1. **[Pre-flight Audit & Verification]**:
+   - Reviewed `tasks/TASK-019-storefront-home-dark-mode-refinement/SPEC.md`.
+   - Confirmed Station 1 boundaries: exactly 4 files (`Hero.tsx`, `DishCard.tsx`, `StorefrontSkeletons.tsx`, `OrderBar.tsx`).
+   - Verified `PROJECT_STATE.json` and updated status to Phase B/C.
+
+2. **[Phase B Complete]**:
+   - Authored `SKILLS_USED.md` with `tailwind-design-system` and `storefront-best-practices`.
+
+3. **[Hero.tsx Execution]**:
+   - Replaced hardcoded ivory `#FDFBF7` on brand pillars with `bg-card` and luxury dark tokens (`dark:border-primary/25`, `dark:shadow-[0_2px_12px_-4px_rgba(0,0,0,0.5)]`).
+
+4. **[DishCard.tsx Execution]**:
+   - Tokenized `tangy` ("حامض حلو") badge using `bg-card dark:bg-[#231b14] text-card-foreground dark:text-foreground border-primary/40`.
+   - Added `dark:bg-secondary/50` to aspect ratio container to prevent beige flicker during dark mode image loads.
+   - Added dark box-shadow elevation `dark:shadow-[0_1px_0_rgba(194,149,103,0.06),0_20px_40px_-24px_rgba(0,0,0,0.7)]`.
+
+5. **[StorefrontSkeletons.tsx Execution]**:
+   - Updated `HeroSkeleton` pillars to `bg-card dark:border-primary/25 dark:shadow-[0_2px_12px_-4px_rgba(0,0,0,0.5)]`.
+   - Added dark elevation shadow to `DishCardSkeleton`.
+
+6. **[OrderBar.tsx Execution]**:
+   - Decoupled capsule from inverted variables (`bg-foreground text-background`).
+   - Anchored capsule to luxury dark roasting tokens: `bg-[#231b14] dark:bg-[#1a130c] text-[#faf7f2] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.7)]`.
+   - Harmonized child borders, counter buttons, and summary texts (`divide-white/10 dark:divide-primary/15`, `bg-white/10 dark:bg-primary/10`, `text-[#E9D3B4] dark:text-primary`, `text-white/65 dark:text-muted-foreground`).
+
+7. **[ProductDetailModal.tsx Refinement (Founder Direct Feedback)]**:
+   - Removed muddy contrasting background from header (`bg-[#FAF7F2]/60 dark:bg-[#1a130c]/90`), allowing it to seamlessly inherit `bg-card` across light and dark modes.
+   - Tokenized action buttons (Share & Close) to `bg-secondary/80 text-foreground border border-primary/20 hover:bg-secondary hover:text-primary`.
+   - Tokenized modal `tangy` badge.
+
+8. **[Admin Dashboard KPI Statistics Cards Dark Mode Refinement (Founder Direct Feedback)]**:
+   - Fixed `OverviewModule.tsx`: Replaced hardcoded muddy `bg-amber-50/40` and `bg-emerald-50/40` and dark text (`text-amber-950`, `text-emerald-950`) with unified `bg-card` and `text-foreground`.
+   - Tokenized icon badges to `bg-amber-500/10 text-amber-600 dark:text-amber-400` and `bg-emerald-500/10 text-emerald-600 dark:text-emerald-400`.
+   - Tokenized active store status pill with `dark:text-emerald-300` and `dark:bg-emerald-400`.
+   - Harmonized `KitchenStats.tsx` and `ReviewsModule.tsx` with identical dark roast tokens.
+
+9. **[Site Content & Reviews Dark Mode Refinement (Founder Direct Feedback)]**:
+   - `SiteContentModule.tsx`: Replaced all hardcoded `bg-[#FDFBF7]` surfaces on Media and Copywriting containers with `bg-card`.
+   - Tokenized subtab switcher buttons (`activeSubTab`) using `bg-primary text-primary-foreground` with dynamic icon colors, eliminating the white-on-white active button bug.
+   - Refined brand logo and favicon preview containers to dark mode cards.
+   - `ReviewsModule.tsx`: Refined review list items and action buttons with semantic dark tokens (`bg-emerald-500/10`, `bg-amber-500/10`).
+
+10. **[Tangy Badge White Text Refinement (Founder Direct Feedback)]**:
+   - Updated `DishCard.tsx`, `ProductDetailModal.tsx`, and `ProductLandingPage.tsx`: Anchored "حامض حلو" badge text to `text-white` with `bg-[#1f150c]/95 border-[#9e774c]/60`, guaranteeing pure crisp white text in both Light Mode and Dark Roast Mode.
+
+11. **[Storefront & Admin Cross-Tab Real-Time Theme Synchronization]**:
+   - `ThemeContext.tsx`: Integrated high-speed `BroadcastChannel('hashousha_theme_channel')` and browser `StorageEvent` listener, ensuring instantaneous real-time dark/light mode toggle across all open tabs, windows, and pages (Storefront ↔ Admin Panel) with zero manual refresh.
+   - `index.html`: Injected synchronous pre-hydration script in `<head>` to prevent theme flicker and immediately apply theme tokens from `localStorage` upon page load.
+
+12. **[ThemeToggle Transparent & Borderless Styling (Founder Direct Feedback)]**:
+   - `ThemeToggle.tsx`: Updated `round` variant to be completely borderless and transparent (`size-10 rounded-full text-foreground/80 hover:bg-secondary hover:text-foreground`), perfectly matching the opposite cart button in `SiteHeader.tsx`. Icon size standardized to `size-5` (`iconSize={20}`) with `strokeWidth={1.5}` and `whileTap={{ scale: 0.9 }}`.
+
+13. **[Verification & Build Sign-Off]**:
+   - Ran `npx tsc --noEmit`: 0 errors (Exit code 0).
+   - Ran `npm run build`: Production build succeeded (`dist/` generated, exit code 0).
+   - Live dev server verified at `http://localhost:5174/` (HTTP 200).

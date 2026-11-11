@@ -1,0 +1,74 @@
+# Execution Log: TASK-027 — Environment Variables Hardening & Secrets Sanitization
+
+> **Task ID:** `TASK-027-environment-variables-hardening-and-secrets-sanitization`  
+> **Milestone:** Milestone 23 — Environment Variables Hardening & Secrets Sanitization  
+> **Executor:** Agent Beta (Senior Full-Stack Implementer)  
+> **Start Time:** 2026-11-11T17:45:00+02:00  
+> **End Time:** 2026-11-11T17:53:00+02:00  
+
+---
+
+## Chronological Operations Trace
+
+### [17:45:10] Phase B: Skills Mobilization & Environmental Readiness
+- Mobilized `vercel-react-best-practices`, `supabase`, and `storefront-best-practices`.
+- Authored `tasks/TASK-027-environment-variables-hardening-and-secrets-sanitization/SKILLS_USED.md`.
+
+### [17:46:00] Step 1: Install dotenv dependency
+- Executed: `npm install -D dotenv`
+- Result: Added 1 package, audited 154 packages with zero breaking changes.
+
+### [17:46:50] Step 2: Environment File Hardening (`.env`)
+- Appended Supabase credentials with mandatory Vite prefix:
+  * `VITE_SUPABASE_URL=https://oulzpjcmnxvvrpdyfpcg.supabase.co`
+  * `VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
+- Preserved existing remote VPS deployment bridge credentials (`VPS_HOST`, `VPS_HOST_IP`, `VPS_USER`, `VPS_PASSWORD`, `VPS_APP_DIR`).
+
+### [17:47:10] Step 3: Authoring Public Template (`.env.example`)
+- Authored `.env.example` containing descriptive instructions and clean placeholders for:
+  * Remote VPS Bridge Configuration
+  * Supabase Cloud Infrastructure (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`)
+
+### [17:47:20] Step 4: Strict TypeScript Ambient Typing (`src/vite-env.d.ts`)
+- Defined `ImportMetaEnv` interface for `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+- Extended `ImportMeta` interface to enforce type safety on `import.meta.env`.
+
+### [17:47:35] Step 5: Client Code Sanitization (`src/services/supabase.ts`)
+- Completely eradicated inline fallback strings containing hardcoded URL and JWT token.
+- Bound client directly to `import.meta.env.VITE_SUPABASE_URL` and `import.meta.env.VITE_SUPABASE_ANON_KEY`.
+- Implemented loud developer diagnostic check in case environment variables are missing.
+
+### [17:48:00 - 17:49:40] Step 6: Refactoring Administrative Scripts (`scripts/`)
+- Injected `dotenv/config` and dynamic environment resolution into all 6 scripts:
+  * `scripts/sync-babka-catalog.mjs`: `import 'dotenv/config'`, reads `process.env`.
+  * `scripts/sync-babka-catalog.ts`: `import 'dotenv/config'`, reads `process.env`.
+  * `scripts/sync-categories.ts`: `import 'dotenv/config'`, reads `process.env`.
+  * `scripts/sync-dishes.ts`: `import 'dotenv/config'`, reads `process.env`.
+  * `scripts/test-seo-rls.ts`: `import 'dotenv/config'`, reads `process.env`.
+  * `scripts/test-theme-colors.ts`: `import 'dotenv/config'`, reads `process.env`.
+
+### [17:51:25] Step 7: AST & Repository Secrets Verification
+- Ran regex search across `src/` and `scripts/` for hardcoded project ref `oulzpjcmnxvvrpdyfpcg`: `0 results`.
+- Ran regex search across `src/` and `scripts/` for JWT token prefix `eyJhbGci`: `0 results`.
+- Verified `dotenv` parsing on local environment:
+  ```
+  ◇ injected env (7) from .env
+  VITE_SUPABASE_URL: https://oulzpjcmnxvvrpdyfpcg.supabase.co KEY_LENGTH: 208
+  ```
+
+### [17:52:45] Step 8: Build Verification Gate
+- Executed `npm run build` (`tsc && vite build`).
+- Output:
+  ```
+  vite v5.4.21 building for production...
+  transforming...
+  ✓ 2037 modules transformed.
+  rendering chunks...
+  computing gzip size...
+  dist/index.html                       3.35 kB │ gzip:   1.44 kB
+  dist/assets/index-CkY0Ec3y.css       72.36 kB │ gzip:  12.53 kB
+  dist/assets/index-B-WfBAxX.js       961.99 kB │ gzip: 256.69 kB
+  dist/assets/heic2any-CTE57s8z.js  1,352.84 kB │ gzip: 341.21 kB
+  ✓ built in 18.94s
+  ```
+- Result: **Exit Code 0** (Zero TypeScript errors, zero asset resolution errors).

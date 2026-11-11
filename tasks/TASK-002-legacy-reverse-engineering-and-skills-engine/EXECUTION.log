@@ -1,0 +1,35 @@
+# TASK-002: Execution & Chronological Operations Trace (Phase C)
+
+> **Task ID:** `TASK-002-legacy-reverse-engineering-and-skills-engine`  
+> **Phase:** Phase C (Execution Log)  
+> **Author:** Agent Alpha (Lead Software Architect)  
+
+---
+
+## 1. Chronological Trace of Operations
+
+1. **Legacy Workspace Audit:**
+   - Inspected `old_store/Hana-Store-FrontEnd-main/` and `old_store/Hana-Store-backEnd-main/`.
+   - Extracted catalog data from `src/assets/generated.json`, `models/Product.js`, `scripts/addProducts.js`.
+   - Identified WhatsApp endpoint (`https://wa.me/966560602341`) in `Cart.jsx`, `ProductDetails.jsx`, `ProductCard.jsx`, `WhatsApp.jsx`.
+   - Inspected admin dashboard mechanics in `Dashboard.jsx` and `ProductsTable.jsx`.
+   - Compiled comprehensive reverse-engineering findings into `docs/LEGACY_SYSTEM_AUDIT.md`.
+
+2. **Constitutional Update (`AGENT_RULES.md`):**
+   - Updated Section 3 (Phase B) to permanently enshrine the Mandatory Just-In-Time Skill Acquisition Protocol.
+   - Mandated Agent Alpha to discover and evaluate skills, and Agent Beta to mobilize them in every task.
+
+3. **Skills Discovery & Installation:**
+   - Ran `npx skills --help` to verify CLI capabilities.
+   - Executed `npx skills find react` -> identified `vercel-labs/agent-skills@vercel-react-best-practices`.
+   - Executed `npx skills add vercel-labs/agent-skills --skill vercel-react-best-practices -y --copy` -> SUCCESS.
+   - Executed `npx skills find tailwind` -> identified `wshobson/agents@tailwind-design-system`.
+   - Executed `npx skills add wshobson/agents --skill tailwind-design-system -y --copy` -> SUCCESS.
+   - Executed `npx skills find mobile` -> identified `designed-by-ai/skills@design-mobile-apps`.
+   - Executed `npx skills add designed-by-ai/skills --skill design-mobile-apps -y --copy` -> SUCCESS.
+   - Executed `npx skills find ecommerce` -> identified `medusajs/medusa-agent-skills@storefront-best-practices`.
+   - Executed `npx skills add medusajs/medusa-agent-skills --skill storefront-best-practices -y --copy` -> SUCCESS.
+   - Created `.agents/skills/README.md` documenting all 4 installed skills and guidelines.
+
+4. **Phase A Specification for TASK-003:**
+   - Authored `tasks/TASK-003-customer-storefront-and-catalog/SPEC.md` leveraging real legacy dishes, rich option models, appetizing category pills, and responsive layout.

@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>خطة تنفيذ وتطوير متجر هشوشة (أسبوعان) — م. كريم أمجد</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --olive-950: #0E2214;
+      --olive-900: #173420;
+      --olive-800: #21492E;
+      --olive-700: #2D5E3B;
+      --olive-600: #3E7A4F;
+      --olive-100: #E3EFE6;
+      --olive-50: #F3F8F4;
+      
+      --pomegranate-900: #580B19;
+      --pomegranate-700: #9B132B;
+      --pomegranate-600: #BE1835;
+      --pomegranate-500: #DC2643;
+      --pomegranate-100: #FCE4E8;
+      --pomegranate-50: #FDF2F4;
+
+      --honey-800: #784B07;
+      --honey-600: #C47D0B;
+      --honey-500: #E59B18;
+      --honey-100: #FDF0D4;
+      --honey-50: #FEF9EE;
+
+      --surface-warm: #FDFBF7;
+      --surface-card: #FFFFFF;
+      --surface-muted: #F6F2E9;
+      --surface-border: #E5DFD3;
+
+      --text-main: #1C1917;
+      --text-muted: #57534E;
+      --text-light: #78716C;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    @page {
+      size: A4 portrait;
+      margin: 0; /* Eliminates browser default headers, footers & URL */
+    }
+
+    body {
+      font-family: 'Readex Pro', 'Cairo', system-ui, sans-serif;
+      background-color: #DED7CB;
+      color: var(--text-main);
+      line-height: 1.55;
+      padding: 24px 0;
+      -webkit-font-smoothing: antialiased;
+      direction: rtl;
+    }
+
+    /* Floating Print Button */
+    .print-bar {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background: rgba(23, 52, 32, 0.95);
+      backdrop-filter: blur(12px);
+      padding: 10px 24px;
+      border-radius: 9999px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .print-btn {
+      background: linear-gradient(135deg, var(--pomegranate-600), var(--pomegranate-700));
+      color: white;
+      border: none;
+      padding: 9px 20px;
+      border-radius: 9999px;
+      font-family: 'Cairo', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px rgba(190, 24, 53, 0.35);
+    }
+
+    .print-btn:hover {
+      transform: scale(1.02);
+      background: linear-gradient(135deg, var(--pomegranate-500), var(--pomegranate-600));
+    }
+
+    .print-hint {
+      color: #E2E8F0;
+      font-size: 12.5px;
+    }
+
+    /* Fixed A4 Page Sheets */
+    .page-sheet {
+      width: 210mm;
+      height: 296.5mm;
+      margin: 0 auto 25px auto;
+      background: var(--surface-warm);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 13mm 16mm 11mm 16mm;
+      page-break-after: always;
+      break-after: page;
+      box-sizing: border-box;
+    }
+
+    /* Running Header & Footer */
+    .page-header-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--surface-border);
+      padding-bottom: 6px;
+      margin-bottom: 12px;
+      font-size: 10.5px;
+      color: var(--text-light);
+    }
+
+    .page-header-strip .brand {
+      font-family: 'Cairo', sans-serif;
+      font-weight: 700;
+      color: var(--olive-900);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .page-header-strip .doc-type {
+      color: var(--olive-700);
+      font-weight: 600;
+    }
+
+    .page-footer-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--surface-border);
+      padding-top: 6px;
+      margin-top: 10px;
+      font-size: 10px;
+      color: var(--text-light);
+    }
+
+    .page-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Cairo', sans-serif;
+    }
+
+    .section-tag {
+      display: inline-block;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      margin-bottom: 6px;
+    }
+
+    .tag-primary {
+      background: var(--olive-50);
+      color: var(--olive-800);
+      border: 1px solid var(--olive-100);
+    }
+
+    .tag-accent {
+      background: var(--honey-50);
+      color: var(--honey-800);
+      border: 1px solid var(--honey-100);
+    }
+
+    .tag-pomegranate {
+      background: var(--pomegranate-50);
+      color: var(--pomegranate-700);
+      border: 1px solid var(--pomegranate-100);
+    }
+
+    .section-title {
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--olive-950);
+      margin-bottom: 3px;
+      line-height: 1.25;
+    }
+
+    .section-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      line-height: 1.45;
+    }
+
+    /* COVER HERO (PAGE 1) */
+    .cover-hero {
+      background: linear-gradient(135deg, var(--olive-950) 0%, var(--olive-900) 65%, var(--olive-800) 100%);
+      color: white;
+      border-radius: 14px;
+      padding: 24px 26px;
+      margin-bottom: 14px;
+      border: 1px solid var(--olive-700);
+      box-shadow: 0 4px 16px rgba(14, 34, 20, 0.15);
+    }
+
+    .cover-emblem {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      padding: 3px 12px;
+      border-radius: 9999px;
+      font-size: 11px;
+      color: var(--honey-100);
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .cover-title {
+      font-size: 25px;
+      font-weight: 900;
+      line-height: 1.25;
+      margin-bottom: 6px;
+      color: #FFFFFF;
+    }
+
+    .cover-subtitle {
+      font-size: 12.5px;
+      color: #D1DFD5;
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+
+    .cover-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .cover-meta-box {
+      background: rgba(0, 0, 0, 0.22);
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .cover-meta-box .lbl {
+      font-size: 9.5px;
+      color: #A3BFAB;
+      margin-bottom: 1px;
+    }
+
+    .cover-meta-box .val {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    /* INTRO LETTER CARD (PAGE 1) */
+    .intro-card {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .intro-greeting {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--olive-900);
+      margin-bottom: 8px;
+    }
+
+    .intro-body {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      text-align: justify;
+    }
+
+    .highlight-pill {
+      font-weight: 700;
+      color: var(--olive-950);
+      background: var(--olive-50);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    .value-pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--surface-border);
+    }
+
+    .value-pillar {
+      background: var(--surface-muted);
+      border-radius: 8px;
+      padding: 8px 10px;
+      text-align: center;
+    }
+
+    .value-pillar .icon {
+      font-size: 16px;
+      margin-bottom: 2px;
+    }
+
+    .value-pillar .title {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--olive-900);
+      margin-bottom: 1px;
+    }
+
+    .value-pillar .desc {
+      font-size: 10px;
+      color: var(--text-muted);
+      line-height: 1.25;
+    }
+
+    /* TIMELINE CARDS (PAGE 2 & 3) */
+    .day-block {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-right: 4px solid var(--olive-700);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 8px;
+      break-inside: avoid;
+    }
+
+    .day-block.pomegranate-border {
+      border-right-color: var(--pomegranate-600);
+    }
+
+    .day-block.honey-border {
+      border-right-color: var(--honey-600);
+    }
+
+    .day-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .day-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--olive-900);
+    }
+
+    .day-timing {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--text-light);
+      background: var(--surface-muted);
+      padding: 1px 8px;
+      border-radius: 9999px;
+    }
+
+    .day-title {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 3px;
+    }
+
+    .day-tasks {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .deliverables-box {
+      background: var(--surface-card);
+      border: 1px dashed var(--olive-600);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .deliverables-box .lbl {
+      font-size: 11.5px;
+      font-weight: 800;
+      color: var(--olive-900);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .deliverables-box .tag {
+      background: var(--olive-100);
+      color: var(--olive-900);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 10.5px;
+      font-weight: 700;
+    }
+
+    /* FINANCIAL TABLES (PAGE 4) */
+    .pricing-table-card {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .fee-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: right;
+    }
+
+    .fee-table th {
+      font-family: 'Cairo', sans-serif;
+      background: #F4EFE6;
+      padding: 7px 10px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--olive-950);
+      border-bottom: 1px solid var(--surface-border);
+    }
+
+    .fee-table td {
+      padding: 7px 10px;
+      font-size: 10.5px;
+      border-bottom: 1px solid var(--surface-border);
+      vertical-align: middle;
+      color: var(--text-main);
+    }
+
+    .fee-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge-fee {
+      font-family: 'Cairo', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--olive-800);
+    }
+
+
+    .inclusions-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .inclusion-item {
+      background: var(--surface-muted);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 10.5px;
+      color: var(--olive-950);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .inclusion-item .check {
+      color: var(--olive-700);
+      font-weight: 800;
+    }
+
+    .signature-card {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .sign-box {
+      border: 1px dashed #D6CEBE;
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: var(--surface-warm);
+    }
+
+    .sign-box .role {
+      font-size: 10.5px;
+      font-weight: 800;
+      color: var(--olive-900);
+      margin-bottom: 2px;
+    }
+
+    .sign-box .name {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .sign-box .sign-line {
+      height: 16px;
+      border-bottom: 1px solid #B0A795;
+      margin-top: 4px;
+    }
+
+    @media print {
+      body {
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .print-bar {
+        display: none !important;
+      }
+      .page-sheet {
+        margin: 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        width: 100% !important;
+        height: 100vh !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Print Trigger -->
+  <div class="print-bar">
+    <button class="print-btn" onclick="window.print()">
+      <span>🖨️</span>
+      <span>حفظ كملف PDF / طباعة الخطة</span>
+    </button>
+    <span class="print-hint">جاهز للطباعة على ورق A4 بدون أي تداخلات أو هوامش متصفح</span>
+  </div>
+
+  <!-- ==========================================
+       PAGE 1: الغلاف والرؤية والركائز
+       ========================================== -->
+  <div class="page-sheet">
+    <div class="page-header-strip">
+      <div class="brand">
+        <span>🌿</span>
+        <span>متجر هشوشة للمحاشي والحلويات الفاخرة</span>
+      </div>
+      <div class="doc-type">وثيقة خطة العمل التنفيذية وجدول الأتعاب • م. كريم أمجد</div>
+    </div>
+
+    <div class="page-content">
+      <!-- Cover Banner -->
+      <div class="cover-hero">
+        <div class="cover-emblem">
+          <span>🌿</span>
+          <span>مشروع التحول الرقمي والتطوير | خطة التنفيذ الميداني</span>
+        </div>
+        <h1 class="cover-title">خطة التنفيذ الميداني الشاملة (14 يوماً عمل) وجدول الأتعاب المهنية</h1>
+        <p class="cover-subtitle">
+          برنامج عملي تنفيذي محكم ينقل متجر "هشوشة" من مجرد رابط إلكتروني إلى منظومة تجارة إلكترونية سريعة ومربحة، تركز على مضاعفة المبيعات وأتمتة طلبات الواتساب في سوق الرياض.
+        </p>
+
+        <div class="cover-meta-grid">
+          <div class="cover-meta-box">
+            <div class="lbl">صاحب المشروع</div>
+            <div class="val">مالك متجر هشوشة</div>
+          </div>
+          <div class="cover-meta-box">
+            <div class="lbl">المطور الهندسي</div>
+            <div class="val">م. كريم أمجد</div>
+          </div>
+          <div class="cover-meta-box">
+            <div class="lbl">الإطار الزمني</div>
+            <div class="val">أسبوعان (14 يوماً حتى الإطلاق)</div>
+          </div>
+          <div class="cover-meta-box">
+            <div class="lbl">نطاق الخدمة</div>
+            <div class="val" style="color: #F8D377;">الرياض — المملكة</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Intro Letter Card -->
+      <div class="intro-card">
+        <div>
+          <h2 class="intro-greeting">أخي وصديقي العزيز / صاحب متجر هشوشة المحترم،</h2>
+          <p class="intro-body">
+            انطلاقاً من خطتنا لتطوير متجر «هشوشة»، يسعدني أن أضع بين يديك هذا البرنامج التنفيذي المباشر والمحدد بـ <span class="highlight-pill">14 يوماً عمل</span> لنقل المتجر إلى الواقع التجاري الحقيقي. لقد صممت هذه الخطة لتُنفّذ بسلاسة تامة مع ضمان استمرار العمل المعتاد في مطبخكم دون أي تعطيل.
+            <br><br>
+            خلال أسبوعين بإذن الله، سنبني معاً <strong>منصة تسوق ذواقة للجوال 100%</strong>، مزودة بمحرك تخصيص للصواني والأحجام والسبايسي يرفع متوسط الفاتورة بنسبة 35%، مع سلة تسوق تحفظ الطلبات، ومولد آلي لفواتير الواتساب المنسقة التي توفر 80% من وقت المتابعة وتلغي الاستفسارات المتكررة لخدمة زبائن الرياض بكل احترافية.
+          </p>
+        </div>
+
+        <div class="value-pillars-grid">
+          <div class="value-pillar">
+            <div class="icon">⏱️</div>
+            <div class="title">دقة الالتزام الزمني</div>
+            <div class="desc">جدول يومي واضح للمهام والتسليم دون أي تأخير</div>
+          </div>
+          <div class="value-pillar">
+            <div class="icon">💎</div>
+            <div class="title">ملكية كاملة 100%</div>
+            <div class="desc">الكود والمنصة ملكك بالكامل دون أي رسوم أو عمولات بيع</div>
+          </div>
+          <div class="value-pillar">
+            <div class="icon">🛡️</div>
+            <div class="title">دعم ومتابعة مستمرة</div>
+            <div class="desc">دعم فني وتدريب مباشر للمطبخ لضمان انطلاق ناجح</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-footer-strip">
+      <span>خطة التنفيذ وعرض الأتعاب • متجر هشوشة الفاخر</span>
+      <span>صفحة 1 من 4</span>
+    </div>
+  </div>
+
+
+  <!-- ==========================================
+       PAGE 2: تفصيل الأسبوع الأول (الأيام 1 - 7)
+       ========================================== -->
+  <div class="page-sheet">
+    <div class="page-header-strip">
+      <div class="brand">
+        <span>🌿</span>
+        <span>متجر هشوشة للمحاشي والحلويات الفاخرة</span>
+      </div>
+      <div class="doc-type">الأسبوع الأول: بناء الواجهة والكتالوج ومحرك الخيارات</div>
+    </div>
+
+    <div class="page-content">
+      <span class="section-tag tag-primary">المرحلة التنفيذية الأولى (الأيام 1 إلى 7)</span>
+      <h2 class="section-title">الأسبوع الأول: تأسيس واجهة المتجر وتجربة العميل الفاخرة</h2>
+      <p class="section-desc">
+        التركيز على بناء الواجهة البصرية الجذابة التي تفتح الشهية، وتنظيم قائمة الأطباق الحقيقية، وإطلاق محرك الخيارات:
+      </p>
+
+      <!-- Day 1 - 2 -->
+      <div class="day-block">
+        <div class="day-header">
+          <div class="day-badge">
+            <span>🥗</span>
+            <span>الأيام 1 و 2: اعتماد الأصول وتجهيز الكتالوج الحقيقي</span>
+          </div>
+          <span class="day-timing">اليوم 1 — 2</span>
+        </div>
+        <div class="day-title">معالجة الصور واستخراج قائمة الأصناف والأسعار الحقيقية</div>
+        <p class="day-tasks">
+          • تحسين صور الأطباق الحقيقية لورق العنب والملفوف والكوكيز والتبولة المستخرجة من المتجر السابق بجودة عالية.<br>
+          • كتابة أوصاف تسويقية شهية وجذابة تعكس طزاجة التتبيلة وزيت الزيتون ودبس الرمان.<br>
+          • تجهيز وتصنيف القائمة (ورق عنب، ملفوف دايب، صواني مشكلة، حلويات وسويت، مقبلات وسلطات).
+        </p>
+      </div>
+
+      <!-- Day 3 - 4 -->
+      <div class="day-block">
+        <div class="day-header">
+          <div class="day-badge">
+            <span>📱</span>
+            <span>الأيام 3 و 4: واجهة المتجر وتصنيفات الأطباق التفاعلية</span>
+          </div>
+          <span class="day-timing">اليوم 3 — 4</span>
+        </div>
+        <div class="day-title">برمجة شريط التبويبات السريع وبطاقات الأطباق الذواقة</div>
+        <p class="day-tasks">
+          • برمجة شريط التصنيفات التفاعلي المثبت أعلى الشاشة لتسهيل التنقل بإبهام اليد على شاشات الجوال.<br>
+          • تصميم بطاقات الأطباق الفاخرة بالأسعار الواضحة والأوسمة التسويقية ("الأكثر طلباً ⭐"، "حامض حلو"، "جديد 🌿").<br>
+          • توفير نظام حماية الصور البديلة في حال انقطاع شبكة الزبون لضمان عدم ظهور أي فراغ مشوه.
+        </p>
+      </div>
+
+      <!-- Day 5 - 7 -->
+      <div class="day-block pomegranate-border">
+        <div class="day-header">
+          <div class="day-badge">
+            <span>✨</span>
+            <span>الأيام 5 و 6 و 7: محرك الخيارات والتخصيص الفوري</span>
+          </div>
+          <span class="day-timing">اليوم 5 — 7</span>
+        </div>
+        <div class="day-title">نافذة التخصيص التفاعلية لزيادة متوسط الفاتورة (AOV)</div>
+        <p class="day-tasks">
+          • برمجة نافذة منبثقة بنقرة زر لاختيار أحجام الصواني (بوكس صغير 15 / وسط 30 / عائلي 50 / صينية 100 حبة).<br>
+          • تحديد درجة السبايسي المفضلة للزبون (عادي معتدل / حار مسمسم 🌶️ / نار إضافي).<br>
+          • تفعيل إضافة الصوصات المدفوعة تلقائياً (دبس رمان مركز +5 ر.س / صوص طحينة +7 ر.س / بصل مقلي مقرمش +4 ر.س).<br>
+          • احتساب فوري ودقيق للسعر الإجمالي المحدث أمام الزبون لتعزيز الثقة.
+        </p>
+      </div>
+
+      <!-- Deliverables Summary Week 1 -->
+      <div class="deliverables-box">
+        <div class="lbl">
+          <span>📦</span>
+          <span>مخرجات الأسبوع الأول المستلمة للمعاينة:</span>
+        </div>
+        <span class="tag">متجر حي تفاعلي + كتالوج كامل + محرك خيارات يعمل 100%</span>
+      </div>
+    </div>
+
+    <div class="page-footer-strip">
+      <span>خطة التنفيذ وعرض الأتعاب • متجر هشوشة الفاخر</span>
+      <span>صفحة 2 من 4</span>
+    </div>
+  </div>
+
+
+  <!-- ==========================================
+       PAGE 3: تفصيل الأسبوع الثاني (الأيام 8 - 14)
+       ========================================== -->
+  <div class="page-sheet">
+    <div class="page-header-strip">
+      <div class="brand">
+        <span>🌿</span>
+        <span>متجر هشوشة للمحاشي والحلويات الفاخرة</span>
+      </div>
+      <div class="doc-type">الأسبوع الثاني: السلة الذكية وفاتورة الواتساب والإطلاق الحي</div>
+    </div>
+
+    <div class="page-content">
+      <span class="section-tag tag-accent">المرحلة التنفيذية الثانية (الأيام 8 إلى 14)</span>
+      <h2 class="section-title">الأسبوع الثاني: سلة الشراء، فاتورة الواتساب، والتشغيل الرسمي</h2>
+      <p class="section-desc">
+        استكمال منظومة الطلب الفوري، أتمتة رسائل الواتساب للمطبخ، تسليم لوحة الإدارة، والتدريب والإطلاق الحي:
+      </p>
+
+      <!-- Day 8 - 9 -->
+      <div class="day-block">
+        <div class="day-header">
+          <div class="day-badge">
+            <span>🛒</span>
+            <span>الأيام 8 و 9: سلة المشتريات التفاعلية وحفظ البيانات</span>
+          </div>
+          <span class="day-timing">اليوم 8 — 9</span>
+        </div>
+        <div class="day-title">سلة شراء عائمة تفتح بسلاسة من الأسفل مع حفظ الطلبات</div>
+        <p class="day-tasks">
+          • سلة منزلقة مريحة للإبهام على الجوال تظهر وتختفي بسلاسة دون إعادة تحميل الصفحة.<br>
+          • ميزة الحفظ التلقائي لمحتويات السلة حتى لو أغلق العميل المتصفح وعاد للشراء في وقت لاحق.<br>
+          • إمكانية تعديل الكميات، كتابة ملاحظات خاصة لكل طبق (مثل: "ليمون زيادة")، وحساب رسوم التوصيل تلقائياً.
+        </p>
+      </div>
+
+      <!-- Day 10 - 11 -->
+      <div class="day-block pomegranate-border">
+        <div class="day-header">
+          <div class="day-badge">
+            <span>🛵</span>
+            <span>الأيام 10 و 11: محرك فاتورة الواتساب الفورية الذاتية</span>
+          </div>
+          <span class="day-timing">اليوم 10 — 11</span>
+        </div>
+        <div class="day-title">توليد أمر تشغيل وطباعة فوري للمطبخ وسائقي الرياض</div>
+        <p class="day-tasks">
+          • نافذة استلام بيانات العميل السريعة (الاسم، الجوال البديل، الحي وعنوان التوصيل في الرياض، وملاحظات الباب).<br>
+          • توليد رسالة واتساب منسقة كالفاتورة متضمنة رقم الطلب الفريد (#HA-XXXX)، تفاصيل الأصناف، والإجمالي النهائي.<br>
+          • تحويل مباشر وفوري بنقرة واحدة إلى محادثة الواتساب المعتمدة لمتجر هشوشة لبدء التجهيز مباشرة.
+        </p>
+      </div>
+
+      <!-- Day 12 -->
+      <div class="day-block honey-border">
+        <div class="day-header">
+          <div class="day-badge">
+            <span>⚙️</span>
+            <span>اليوم 12: لوحة تحكم التاجر السريعة من الجوال</span>
+          </div>
+          <span class="day-timing">اليوم 12</span>
+        </div>
+        <div class="day-title">إدارة المخزون والأسعار واستقبال الطلبات بلمسة زر</div>
+        <p class="day-tasks">
+          • لوحة تحكم خفيفة تتيح للمالك بنقرة زر إيقاف أي صنف نفذت كميته من المطبخ لمنع الإحراج مع الزبائن.<br>
+          • إمكانية تعديل الأسعار، فتح أو إغلاق استقبال الطلبات، وتغيير رقم هاتف الواتساب فوراً وبدون أي مبرمج.
+        </p>
+      </div>
+
+      <!-- Day 13 - 14 -->
+      <div class="day-block">
+        <div class="day-header">
+          <div class="day-badge">
+            <span>🚀</span>
+            <span>الأيام 13 و 14: الاختبارات والتدريب والإطلاق الرسمي</span>
+          </div>
+          <span class="day-timing">اليوم 13 — 14</span>
+        </div>
+        <div class="day-title">فحص سرعة الشبكات، تدريب فريق العمل، وبدء البيع الميداني</div>
+        <p class="day-tasks">
+          • اختبار المتجر على مختلف شبكات الجوال في الرياض (5G / 4G / Wi-Fi) وهواتف آيفون وأندرويد.<br>
+          • تدريب عملي ومباشر لصاحب العمل ومسؤول المطبخ على متابعة الطلبات واستخدام لوحة التحكم.<br>
+          • الإطلاق الرسمي الحي وربط المتجر بـ Bio إنستغرام وتيك توك ورقم الواتساب الرسمي وبدء جني المبيعات!
+        </p>
+      </div>
+
+      <!-- Deliverables Summary Week 2 -->
+      <div class="deliverables-box">
+        <div class="lbl">
+          <span>🎉</span>
+          <span>مخرجات الأسبوع الثاني والنهائية:</span>
+        </div>
+        <span class="tag">متجر متكامل شغال لايف + لوحة تحكم + تدريب كامل وتسليم المفاتيح</span>
+      </div>
+    </div>
+
+    <div class="page-footer-strip">
+      <span>خطة التنفيذ وعرض الأتعاب • متجر هشوشة الفاخر</span>
+      <span>صفحة 3 من 4</span>
+    </div>
+  </div>
+
+
+  <!-- ==========================================
+       PAGE 4: الأتعاب والتسليم النهائي
+       ========================================== -->
+  <div class="page-sheet">
+    <div class="page-header-strip">
+      <div class="brand">
+        <span>🌿</span>
+        <span>متجر هشوشة للمحاشي والحلويات الفاخرة</span>
+      </div>
+      <div class="doc-type">جدول الأتعاب والتسليم النهائي • م. كريم أمجد</div>
+    </div>
+
+    <div class="page-content">
+      <span class="section-tag tag-pomegranate">الأتعاب والتسليم</span>
+      <h2 class="section-title">أتعاب التنفيذ والتسليم النهائي الشامل</h2>
+      <p class="section-desc">
+        اتفاق عمل مباشر ومحدد لتنفيذ وبرمجة المتجر بأعلى المعايير الهندسية والاحترافية:
+      </p>
+
+      <!-- Single Row Fee Table -->
+      <div class="pricing-table-card">
+        <table class="fee-table">
+          <thead>
+            <tr>
+              <th>بند العمل والتطوير الهندسي</th>
+              <th>تفاصيل ونطاق التنفيذ</th>
+              <th>المدة المقررة</th>
+              <th>إجمالي الأتعاب</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>تطوير وإطلاق متجر هشوشة الإلكتروني الشامل</strong></td>
+              <td>تصميم الواجهة المخصصة للجوال 100% + كتالوج الأصناف المطور والأوصاف + محرك خيارات الأحجام والسبايسي والصوصات + سلة الشراء الذكية مع حفظ البيانات + مولد فواتير الواتساب التلقائية للمطبخ + لوحة تحكم التاجر السريعة.</td>
+              <td>14 يوماً</td>
+              <td><span class="badge-fee" style="font-size: 16px; color: var(--pomegranate-700);">150 دولار فقط</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Inclusions -->
+      <div class="inclusions-grid">
+        <div class="inclusion-item"><span class="check">✓</span> كود مصدري كامل متاح لكم بدون أي قيود أو اشتراكات للمنصات</div>
+        <div class="inclusion-item"><span class="check">✓</span> صفر عمولات على المبيعات (أرباح المتجر بالكامل لكم)</div>
+        <div class="inclusion-item"><span class="check">✓</span> سرعة فائقة تفتح بأقل من ثانية على شبكات الجوال في الرياض</div>
+        <div class="inclusion-item"><span class="check">✓</span> تدريب ومتابعة مباشرة للمطبخ لضمان جاهزية التشغيل الفوري</div>
+      </div>
+
+      <!-- Signatures Box -->
+      <div class="signature-card">
+        <div class="sign-box">
+          <div class="role">الطرف الأول (المهندس المنفذ):</div>
+          <div class="name">م. كريم أمجد (مهندس ومطور النظام)</div>
+          <div style="font-size: 9.5px; color: var(--olive-700); font-weight: 700;">جاهز للتنفيذ والالتزام بالتسليم في الموعد ✓</div>
+          <div class="sign-line"></div>
+        </div>
+        <div class="sign-box">
+          <div class="role">الطرف الثاني (صاحب المشروع):</div>
+          <div class="name">مالك متجر هشوشة</div>
+          <div style="font-size: 9.5px; color: var(--text-light);">الموافقة واعتماد بدء التنفيذ:</div>
+          <div class="sign-line"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-footer-strip">
+      <span>خطة التنفيذ وعرض الأتعاب • متجر هشوشة الفاخر</span>
+      <span>صفحة 4 من 4</span>
+    </div>
+  </div>
+
+</body>
+</html>

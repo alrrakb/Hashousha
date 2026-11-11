@@ -1,0 +1,84 @@
+# Phase C: Execution Log
+## TASK-011: Luxury Skeleton Loading & Perceived Performance
+
+> **Task ID:** `TASK-011-luxury-skeleton-loading-and-perceived-performance`  
+> **Phase:** Phase C (Implementation Trace & Verification)  
+> **Assignee:** Agent Beta (Senior Full-Stack Implementer)  
+> **Started:** 2026-10-05T06:01:30Z  
+> **Completed:** 2026-10-05T06:08:00Z  
+
+---
+
+### Entry 01: Pre-Execution Audit & SPEC Ingestion
+- Ingested architectural directives from `tasks/TASK-011-luxury-skeleton-loading-and-perceived-performance/SPEC.md`.
+- Updated `tasks/INDEX.md` line 23 to `Phase B | 🟡 In-Progress`.
+- Mobilized 4 foundational skills in `SKILLS_USED.md` (`storefront-best-practices`, `design-mobile-apps`, `tailwind-design-system`, `vercel-react-best-practices`).
+- Verified target files to modify.
+
+---
+
+### Entry 02: CSS Shimmer Upgrade (`src/index.css`)
+- Replaced baseline shimmer with high-visibility, hotel-grade luxury golden bronze animation.
+- Set base color `#ebdccb` for warm linen contrast against `#faf7f2` canvas.
+- Configured hardware-accelerated 60fps `@keyframes luxury-shimmer` with `transform: translateX(-100%)` to `translateX(100%)` and `will-change: transform`.
+- Luminous gradient incorporates pure white highlights (`rgba(255, 255, 255, 0.75)`) and royal bronze gold accents (`rgba(217, 182, 133, 0.60)`).
+
+---
+
+### Entry 03: Storefront Skeletons Calibration (`src/components/storefront/v0/StorefrontSkeletons.tsx`)
+- Verified and aligned `DishCardSkeleton`:
+  - 1:1 geometry match with `DishCard`: `aspect-[4/3]`, `rounded-[1.75rem]`, exact border `border-primary/15`, and shadow tokens.
+  - Subtitle, title, description, price, and CTA steppers calibrated with `.skeleton-shimmer`.
+- Verified and aligned `CategoryPillsSkeleton`:
+  - Shimmering capsules with varied realistic widths (`100px`, `110px`, `95px`, `120px`, `85px`) on `h-11` pill buttons.
+- Verified and aligned `ProductLandingSkeleton`:
+  - 1:1 match with `ProductLandingPage`: top luxury nav, panoramic photo column (`aspect-[4/3] rounded-3xl`), title, price box, highlights box, and sticky CTA button.
+
+---
+
+### Entry 04: Perceived Performance Activation in `MenuSection.tsx`
+- Root Cause Identified: Because dishes and categories were initialized synchronously with local default datasets in Zustand and React state, the conditionals (`dishes.length === 0` and `categoriesList.length <= 1`) were constantly false, preventing skeletons from ever showing.
+- Implemented `isInitialLoading` state with a calibrated 750ms luxury presentation window on mount.
+- Connected `CategoryPillsSkeleton` to display during initial presentation window.
+- Connected `MenuGridSkeleton count={6}` to display during initial presentation window.
+- Implemented Framer Motion `<AnimatePresence mode="wait">` crossfade between the skeleton grid and the real dish cards, providing an ultra-smooth transition with zero layout shift.
+
+---
+
+### Entry 05: Permanent Eradication of `animate-spin` in `ProductLandingPage.tsx`
+- Completely purged generic spinner `<div className="... animate-spin" />`.
+- Added `initialLoading` state (700ms presentation window) triggering `<ProductLandingSkeleton />` immediately upon route mount or slug transition.
+- Implemented `imgLoaded` state with smooth opacity transition (`duration-700`) and `.skeleton-shimmer` placeholder in the hero photo container.
+- Wrapped standalone page in Framer Motion fade-in (`motion.div` with `opacity: 0 -> 1`).
+
+---
+
+### Entry 06: Hero Photography Skeleton Shimmer in `ProductDetailModal.tsx` & `DishCard.tsx`
+- In `ProductDetailModal.tsx`:
+  - Added `imgLoaded` state reset on `[dish?.id, isOpen]`.
+  - Added `.skeleton-shimmer` placeholder in hero photography container.
+  - Configured `onLoad={() => setImgLoaded(true)}` with smooth opacity fade-in.
+- In `DishCard.tsx`:
+  - Added `imgLoaded` state and `.skeleton-shimmer` overlay to guarantee zero blank voids while catalog dish photography streams over mobile connections.
+
+---
+
+### Entry 07: Automated Verification & Build
+- Executed `npm run build`:
+  - TypeScript checking (`tsc`): 0 errors.
+  - Vite production bundle: 2024 modules transformed successfully in 20.08s.
+  - Dev server confirmed running and healthy on `http://localhost:5174/` (HTTP 200).
+
+---
+
+### Entry 08: Universal Storefront Skeleton Architecture (Header, Hero & Footer)
+- Added `SiteHeaderSkeleton` and `HeroSkeleton` to `StorefrontSkeletons.tsx`.
+- Updated `SiteHeader.tsx` to accept `isLoading` and crossfade with `<AnimatePresence mode="wait">` to `SiteHeaderSkeleton`.
+- Updated `Hero.tsx` to accept `isLoading` and crossfade with `<AnimatePresence mode="wait">` to `HeroSkeleton`, plus image shimmer overlay with `onLoad` fade-in.
+- Orchestrated unified `isStorefrontLoading` in `src/App.tsx` (850ms initial presentation window) driving:
+  1. `SiteHeader`
+  2. `Hero` (Banner + 4 Highlights)
+  3. `MenuSection` (Category Pills + 6 Dish Cards Grid)
+  4. Footer branding
+- Ran `npm run build`: passed cleanly (Exit code: 0, 2024 modules, 0 errors).
+

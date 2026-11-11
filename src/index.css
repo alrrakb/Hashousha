@@ -1,0 +1,199 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --background: #faf7f2;
+  --foreground: #2e1e0d;
+  --card: #fdfbf7;
+  --card-foreground: #2e1e0d;
+  --popover: #fdfbf7;
+  --popover-foreground: #2e1e0d;
+  --primary: #9e774c;
+  --primary-foreground: #faf7f2;
+  --secondary: #f5efeb;
+  --secondary-foreground: #2e1e0d;
+  --muted: #f5efeb;
+  --muted-foreground: #6b5a48;
+  --accent: #931f2d;
+  --accent-foreground: #faf7f2;
+  --destructive: #931f2d;
+  --border: #e8ddd0;
+  --input: #e8ddd0;
+  --ring: #9e774c;
+  --radius: 1rem;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: #1a120b;
+  --foreground: #faf7f2;
+  --card: #241a12;
+  --card-foreground: #faf7f2;
+  --popover: #241a12;
+  --popover-foreground: #faf7f2;
+  --primary: #c29567;
+  --primary-foreground: #1a120b;
+  --secondary: #2b221a;
+  --secondary-foreground: #faf7f2;
+  --muted: #2b221a;
+  --muted-foreground: #a89887;
+  --accent: #931f2d;
+  --accent-foreground: #faf7f2;
+  --destructive: #b91c1c;
+  --border: #3d2c1e;
+  --input: #3d2c1e;
+  --ring: #c29567;
+}
+
+@layer base {
+  html {
+    direction: rtl;
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: 'Cairo', 'Readex Pro', system-ui, -apple-system, sans-serif;
+    background-color: var(--background);
+    color: var(--foreground);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Custom scrollbar styled with warm tones */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #e8ddd0;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #9e774c;
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background: #382b20;
+  }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: #c29567;
+  }
+}
+
+.linen {
+  background-color: var(--background);
+  background-image:
+    repeating-linear-gradient(0deg, rgba(158, 119, 76, 0.035) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(158, 119, 76, 0.03) 0 1px, transparent 1px 4px),
+    radial-gradient(ellipse at top, #f5efeb 0%, transparent 60%);
+}
+
+.dark .linen {
+  background-color: var(--background);
+  background-image:
+    repeating-linear-gradient(0deg, rgba(194, 149, 103, 0.04) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(194, 149, 103, 0.035) 0 1px, transparent 1px 4px),
+    radial-gradient(ellipse at top, rgba(35, 27, 20, 0.85) 0%, transparent 70%);
+}
+
+@media print {
+  @page {
+    size: auto;
+    margin: 6mm;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  body * {
+    visibility: hidden;
+  }
+  .kitchen-ticket-printable,
+  .kitchen-ticket-printable * {
+    visibility: visible;
+  }
+  .kitchen-ticket-printable {
+    position: static !important;
+    width: 100% !important;
+    max-width: 480px !important;
+    margin: 0 auto !important;
+    padding: 10px !important;
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+  }
+  /* Remove scrollbars, clipping and fixed viewport constraints when printing */
+  div:has(> div > div > .kitchen-ticket-printable),
+  div:has(> div > .kitchen-ticket-printable),
+  div:has(> .kitchen-ticket-printable) {
+    position: static !important;
+    display: block !important;
+    overflow: visible !important;
+    max-height: none !important;
+    height: auto !important;
+    background: white !important;
+    backdrop-filter: none !important;
+    filter: none !important;
+    transform: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Hotel-Grade Luxury Skeleton Shimmer (Hardware-Accelerated 60fps) */
+@keyframes luxury-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+  background-color: #ebdccb;
+}
+
+.skeleton-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.75) 35%,
+    rgba(217, 182, 133, 0.6) 50%,
+    rgba(255, 255, 255, 0.75) 65%,
+    transparent 100%
+  );
+  animation: luxury-shimmer 1.5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.dark .skeleton-shimmer {
+  background-color: #261e16;
+}
+
+.dark .skeleton-shimmer::after {
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(194, 149, 103, 0.12) 35%,
+    rgba(194, 149, 103, 0.22) 50%,
+    rgba(194, 149, 103, 0.12) 65%,
+    transparent 100%
+  );
+}
+

@@ -1,0 +1,79 @@
+# Phase C: Chronological Execution Trace
+## TASK-008: Merchant Center Overhaul, Catalog CRUD & Hybrid SEO Engine
+
+> **Task ID:** `TASK-008-merchant-center-catalog-crud-and-hybrid-seo`  
+> **Phase:** Phase C (Active Implementation & Execution Log)  
+> **Assignee:** Agent Beta (Senior Full-Stack Implementer)  
+> **Timestamp:** 2026-10-05T04:34:50Z  
+
+---
+
+### [2026-10-05T04:34:50Z] Entry 01 — Phase B Initialization & Environment Verification
+- Verified `tasks/INDEX.md` line 20 updated to `Phase B | 🟡 In-Progress`.
+- Mobilized 4 skills (`storefront-best-practices`, `tailwind-design-system`, `design-mobile-apps`, `vercel-react-best-practices`) in `SKILLS_USED.md`.
+- Read and validated `SPEC.md` requirements:
+  * 7-module Merchant Center (`Overview`, `Products`, `Categories`, `Orders`, `Customers`, `Discounts`, `SEO`).
+  * Supabase Storage upload to `dishes` bucket.
+  * Categories CRUD synchronized with storefront tabs.
+  * Customer CRM aggregating orders with phone and WhatsApp.
+  * Discounts CRUD with coupon code validation in `CheckoutModal.tsx`.
+  * SEO settings with live Google SERP preview card.
+  * Hybrid SEO architecture: In-store `ProductDetailModal` with pushState and standalone `ProductLandingPage` with `schema.org/Product` JSON-LD.
+
+---
+
+### [2026-10-05T04:35:15Z] Entry 02 — Domain Types & Cloud Services
+- Created `src/types/admin.ts` with definitions for `AdminTab`, `AdminCategory`, `AdminDiscount`, `CustomerSummary`, `SeoSettings`.
+- Updated `src/types/menu.ts` with `slug?`, `seoTitle?`, `seoDescription?`, and `category: string`.
+- Updated `src/data/menu.ts` with default slugs and SEO metadata for all dishes.
+- Created `src/services/adminService.ts` providing:
+  * `uploadDishImage(file)` targeting Supabase Storage bucket `dishes`.
+  * Products CRUD (`fetchDishesFromSupabase`, `saveDishToSupabase`, `deleteDishFromSupabase`).
+  * Categories CRUD (`fetchCategoriesFromSupabase`, `saveCategoryToSupabase`, `deleteCategoryFromSupabase`).
+  * Discounts CRUD (`fetchDiscountsFromSupabase`, `saveDiscountToSupabase`, `deleteDiscountFromSupabase`, `validateCouponCode`).
+  * SEO CRUD (`fetchSeoSettings`, `saveSeoSettings`).
+  * Customers CRM aggregator (`aggregateCustomersFromOrders`).
+
+---
+
+### [2026-10-05T04:38:00Z] Entry 03 — Merchant Center Modules & Layout Construction
+- Created `src/components/admin/MerchantSidebar.tsx` supporting 7 royal tabs, active counts, and responsive mobile drawer.
+- Created all 7 Admin Modules under `src/components/admin/modules/`:
+  1. `OverviewModule.tsx`: Financial KPIs, top Riyadh dishes, real-time recent orders stream.
+  2. `ProductEditModal.tsx`: Dishes modal with Supabase Storage upload, badge selectors, auto-slug generator, and SEO metadata inputs.
+  3. `ProductsModule.tsx`: Products catalog table with instant stock switch, search, and category filter.
+  4. `CategoriesModule.tsx`: Categories CRUD table with sort orders and active toggles.
+  5. `OrdersModule.tsx`: 6-stage order lifecycle pipeline with thermal receipt printing.
+  6. `CustomersModule.tsx`: Riyadh CRM table with metrics and direct `tel:` / `wa.me` action buttons.
+  7. `DiscountsModule.tsx`: Coupon engine CRUD with min-order thresholds.
+  8. `SeoModule.tsx`: SEO meta settings with live Google SERP preview card.
+- Created `src/components/admin/MerchantCenter.tsx` and `src/components/admin/MerchantLayout.tsx`:
+  * Seamless layout assembling sidebar, top navigation, Supabase Realtime broadcast listener, audio chime, and active module view.
+
+---
+
+### [2026-10-05T04:42:00Z] Entry 04 — Hybrid SEO Engine & Storefront Wiring
+- Created `src/components/storefront/v0/ProductDetailModal.tsx`:
+  * In-store luxury preview modal updating browser address to `/dish/:slug` via `history.pushState` without reload.
+  * Closes gracefully and reverts URL back to `/`.
+- Created `src/components/storefront/v0/ProductLandingPage.tsx`:
+  * Standalone crawlable page for external Google traffic with OpenGraph meta tags and `schema.org/Product` JSON-LD rich snippet.
+  * Direct ordering CTA adding to cart and opening checkout.
+- Modified `src/components/checkout/CheckoutModal.tsx`:
+  * Added coupon input and real-time coupon validation using `validateCouponCode`.
+  * Computes and deducts coupon discount from total with green confirmation badge.
+- Modified `src/components/storefront/v0/DishCard.tsx`:
+  * Added `onSelectDish` callback on card click to open `ProductDetailModal`.
+  * Added `e.stopPropagation()` on quantity modifiers to prevent unwanted modal popups.
+- Modified `src/components/storefront/v0/MenuSection.tsx`:
+  * Added dynamic category synchronization from Supabase `categories` table.
+- Modified `src/App.tsx`:
+  * Hybrid routing coordinator: `/admin` -> `MerchantCenter`, `/dish/:slug` -> `ProductLandingPage`, `/` -> customer storefront with `ProductDetailModal`.
+
+---
+
+### [2026-10-05T04:46:00Z] Entry 05 — Production Compilation Verification
+- Ran `npm run build` (`tsc && vite build`).
+- Resolved TypeScript unused variable warnings.
+- Exit code: 0 (Built in 15.54s, 1665 modules transformed successfully).
+- All acceptance criteria satisfied.

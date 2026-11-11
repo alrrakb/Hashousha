@@ -1,0 +1,115 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  darkMode: 'class',
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
+        card: {
+          DEFAULT: 'var(--card)',
+          foreground: 'var(--card-foreground)',
+        },
+        popover: {
+          DEFAULT: 'var(--popover)',
+          foreground: 'var(--popover-foreground)',
+        },
+        primary: {
+          DEFAULT: 'var(--primary)',
+          foreground: 'var(--primary-foreground)',
+        },
+        secondary: {
+          DEFAULT: 'var(--secondary)',
+          foreground: 'var(--secondary-foreground)',
+        },
+        muted: {
+          DEFAULT: 'var(--muted)',
+          foreground: 'var(--muted-foreground)',
+        },
+        accent: {
+          DEFAULT: 'var(--accent)',
+          foreground: 'var(--accent-foreground)',
+        },
+        destructive: {
+          DEFAULT: 'var(--destructive)',
+        },
+        border: 'var(--border)',
+        input: 'var(--input)',
+        ring: 'var(--ring)',
+        olive: {
+          50: '#F3F8F4',
+          100: '#E3EFE6',
+          200: '#C8DFCD',
+          500: '#528D63',
+          700: '#2D5E3B',
+          800: '#21492E',
+          900: '#173420',
+          950: '#0E2214',
+        },
+        pomegranate: {
+          50: '#FDF2F4',
+          100: '#FCE4E8',
+          500: '#DC2643',
+          600: '#BE1835',
+          700: '#9B132B',
+          900: '#580B19',
+        },
+        honey: {
+          50: '#FEF9EE',
+          100: '#FDF0D4',
+          500: '#E59B18',
+          600: '#C47D0B',
+          800: '#784B07',
+        },
+        bronze: {
+          50: '#FAF6F0',
+          100: '#F4EBDD',
+          200: '#E8D8BF',
+          300: '#D5BE9B',
+          400: '#C4A67B',
+          500: '#B88E5D',
+          600: '#9E774C',
+          700: '#845F37',
+          800: '#6A4926',
+          900: '#4B3218',
+          950: '#2E1E0D',
+        },
+        ivory: '#FAF7F2',
+        linen: '#F5EFEB',
+        surface: {
+          warm: '#FDFBF7',
+          card: '#FFFFFF',
+          muted: '#F7F4EC',
+          border: '#EAE4D7',
+        },
+        text: {
+          primary: '#1A1816',
+          secondary: '#4A453F',
+          muted: '#7D756C',
+          'on-dark': '#FFFFFF',
+        },
+      },
+      fontFamily: {
+        sans: ['Cairo', 'Readex Pro', 'system-ui', 'sans-serif'],
+        display: ['Cairo', 'system-ui', 'sans-serif'],
+        body: ['Readex Pro', 'Cairo', 'system-ui', 'sans-serif'],
+        cairo: ['Cairo', 'system-ui', 'sans-serif'],
+        readex: ['Readex Pro', 'Cairo', 'system-ui', 'sans-serif'],
+        serif: ['Cormorant Garamond', 'Georgia', 'serif'],
+      },
+      boxShadow: {
+        'gourmet-sm': '0 2px 8px -2px rgba(45, 30, 15, 0.06)',
+        'gourmet-md': '0 6px 18px -4px rgba(45, 30, 15, 0.08), 0 2px 6px -1px rgba(45, 30, 15, 0.04)',
+        'gourmet-lg': '0 12px 32px -6px rgba(45, 30, 15, 0.12), 0 4px 12px -2px rgba(45, 30, 15, 0.06)',
+        'gourmet-float': '0 20px 48px -8px rgba(45, 30, 15, 0.18)',
+      },
+      borderRadius: {
+        '3xl': '1.5rem',
+        '2rem': '2rem',
+        '1.75rem': '1.75rem',
+      },
+    },
+  },
+  plugins: [],
+};

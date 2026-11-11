@@ -1,0 +1,59 @@
+# Phase C: Execution Trace — TASK-017
+
+> **Task ID:** `TASK-017-luxury-dark-mode-theme-engine-and-storefront-toggles`  
+> **Lifecycle Phase:** Phase C (Execution & Verification)  
+> **Implementer:** Agent Beta (Senior Full-Stack Implementer)  
+> **Timestamp:** 2026-10-09T06:43:30+03:00  
+
+---
+
+## Chronological Action Log
+
+1. **[Pre-flight Audit]**:
+   - Inspected `tailwind.config.js`, `src/index.css`, `SiteHeader.tsx`, and `MerchantCenter.tsx`.
+   - Verified active state in `tasks/INDEX.md` and `PROJECT_STATE.json`.
+   - Mobilized skills in `SKILLS_USED.md` (`tailwind-design-system`, `storefront-best-practices`, `vercel-react-best-practices`).
+
+2. **[Step 1: Tailwind Configuration]**:
+   - Updated `tailwind.config.js` to enable class-based dark mode (`darkMode: 'class'`).
+
+3. **[Step 2: Hotel-Grade Dark Theme Tokens & CSS Enhancements]**:
+   - Implemented `.dark` design tokens in `src/index.css`:
+     * Background: `#17110B` (Dark Espresso)
+     * Card / Popover: `#231B14` (Warm Cocoa)
+     * Primary: `#C29567` (Gilded Bronze)
+     * Foreground: `#FAF7F2` (Warm Ivory)
+     * Secondary & Muted: `#2B221A`, Muted Foreground: `#A89887`
+     * Border / Input: `#382B20` (Warm Walnut)
+   - Created dark-adapted `.linen` gradient texture:
+     `repeating-linear-gradient` with warm bronze lines on radial `rgba(35, 27, 20, 0.85)`.
+   - Configured dark `.skeleton-shimmer` with bronze-warm highlights.
+   - Customized dark scrollbar thumb (`#382B20` with `#C29567` hover).
+
+4. **[Step 3: Theme Context & Engine]**:
+   - Created `src/context/ThemeContext.tsx`:
+     * Persistent state in `localStorage` under key `'hashousha_theme'`.
+     * System preference detection (`window.matchMedia('(prefers-color-scheme: dark)')`).
+     * Real-time listener for OS preference changes when no explicit stored preference.
+     * Dynamic document class synchronization (`document.documentElement.classList.toggle('dark')` and `style.colorScheme`).
+     * Clean React Context API with `ThemeProvider` and `useTheme()`.
+   - Wrapped `<App />` with `<ThemeProvider>` in `src/main.tsx`.
+
+5. **[Step 4: Reusable ThemeToggle Component]**:
+   - Created `src/components/common/ThemeToggle.tsx`:
+     * Supports `'round'` (Storefront) and `'rect'` (Merchant Center) variants.
+     * Tactile Framer Motion spring physics (`whileTap={{ scale: 0.92 }}`, `whileHover={{ scale: 1.05 }}`).
+     * Smooth icon rotation transition with `AnimatePresence` (`Sun` for dark mode, `Moon` for light mode).
+     * Accessible ARIA labels in Arabic (`التبديل إلى الوضع النهاري` / `التبديل إلى الوضع الليلي الفندقي`).
+
+6. **[Step 5: Storefront & Merchant Center Integration]**:
+   - Embedded `ThemeToggle` into `src/components/storefront/v0/SiteHeader.tsx` replacing the static spacer.
+   - Embedded `ThemeToggle` into `src/components/storefront/v0/ProductLandingPage.tsx` header actions.
+   - Embedded `ThemeToggle` into `src/components/admin/MerchantCenter.tsx` top navbar.
+   - Updated `FloatingWhatsApp.tsx` tooltip to respect theme card colors (`bg-card`, `text-foreground`).
+
+7. **[Step 6: Build & Verification Pass]**:
+   - Executed `npm run build`: `tsc && vite build`.
+   - Output: Exited with code 0 in 35.71s.
+   - 0 TypeScript compilation errors.
+   - Production bundle compiled cleanly.

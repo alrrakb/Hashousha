@@ -1,0 +1,78 @@
+# EXECUTION LOG — TASK-026: Client-Side WebP Image Optimization, Favicon Uploader & Master Dark Mode Circuit Breaker
+
+> **Task ID:** `TASK-026-client-side-webp-image-optimization-and-favicon-uploader`  
+> **Milestone:** Milestone 22 — Client-Side WebP Image Optimization, Favicon Uploader & Master Dark Mode Circuit Breaker  
+> **Execution Date:** 2026-10-14  
+> **Agent:** Agent Beta (Senior Full-Stack Implementer)  
+> **Status:** Completed (Phase C Finished)  
+
+---
+
+## 1. Chronological Execution Trace
+
+### Step 1: Verification of Dependencies & Ambient TypeScript Definitions
+- Confirmed `heic2any` (`^0.0.4`) installed in `node_modules` via Node runtime resolution.
+- Created `src/types/heic2any.d.ts` defining `Heic2AnyOptions` and `heic2any` function signature to guarantee strict zero-error TypeScript typing.
+
+### Step 2: Supabase DDL Cloud Schema Migration
+- Authored `supabase/migrations/20261014_dark_mode_toggle.sql`:
+  ```sql
+  ALTER TABLE public.site_content 
+  ADD COLUMN IF NOT EXISTS dark_mode_enabled BOOLEAN DEFAULT true;
+  ```
+- Executed query against Supabase project `oulzpjcmnxvvrpdyfpcg` via `execute_sql` MCP tool.
+- Verified column addition in `information_schema.columns`.
+
+### Step 3: Type Definitions & Admin Services Update
+- Updated `src/types/admin.ts`:
+  - Added `darkModeEnabled?: boolean` to `SiteContentSettings`.
+  - Added `darkModeEnabled: true` to `DEFAULT_SITE_CONTENT`.
+- Updated `src/services/adminService.ts`:
+  - Added `dark_mode_enabled?: boolean` to `CloudSiteContentRow`.
+  - Deserialized `darkModeEnabled` in `fetchSiteContent()`.
+  - Serialized `dark_mode_enabled` in `saveSiteContent()`.
+  - Integrated `optimizeImageToWebp` with `OPTIMIZER_PRESETS.dish` inside `uploadDishImage()` to guarantee all cloud-stored dish assets are lightweight WebP.
+
+### Step 4: Client-Side Image Optimizer Pipeline (`src/utils/imageOptimizer.ts`)
+- Created high-performance utility:
+  - Presets: `dish` (1400x1400 @ 0.84), `hero` (1920x1080 @ 0.85), `logo` (800x800 @ 0.90), `favicon` (128x128 @ 0.90).
+  - Dynamic on-demand import of `heic2any` for iOS HEIC/HEIF photos, creating an isolated code-split chunk.
+  - Aspect-ratio preserving Canvas bicubic resizing.
+  - Canvas `toBlob('image/webp', quality)` conversion.
+  - Savings calculation percentage & formatFileSize utility.
+  - Resilient error handling falling back to original blob upon any browser limitation.
+
+### Step 5: Provider Hierarchy Inversion (`src/main.tsx`)
+- Inverted provider nesting so that `SiteContentProvider` wraps `ThemeProvider`.
+- Enables `ThemeProvider` to reactively consume cloud `content.darkModeEnabled` setting without prop drilling.
+
+### Step 6: Master Dark Mode Circuit Breaker (`ThemeContext.tsx` & `ThemeToggle.tsx`)
+- In `src/context/ThemeContext.tsx`:
+  - Exposed `darkModeEnabled` in `ThemeContextValue`.
+  - Intercepted `toggleTheme` and `setTheme` when `!darkModeEnabled`.
+  - Implemented active DOM `MutationObserver` to strip `.dark` class and enforce light color-scheme if modified externally.
+- In `src/components/common/ThemeToggle.tsx`:
+  - Completely unmounted button (`return null`) whenever `darkModeEnabled === false`.
+
+### Step 7: Dynamic Head Favicon Sync (`SiteContentContext.tsx`)
+- Added reactive `useEffect` monitoring `content.favicon` and dynamically updating all `link[rel*='icon']` tags in document head.
+
+### Step 8: Admin Interfaces Enhancement
+- In `SiteContentModule.tsx`:
+  - Added WebP optimizer to `handleFileUpload` with preset selection.
+  - Added native "رفع أيقونة" button with hidden file input (`faviconInputRef`) in Favicon Card.
+  - Added real-time emerald WebP compression feedback badge (`✨ تم تحويل وضغط الصورة تلقائياً لـ WebP...`) across all media cards.
+  - Added luxury Master Dark Mode Switch card in Theme sub-tab with immediate visual indicator.
+- In `ProductEditModal.tsx`:
+  - Connected `optimizeImageToWebp` into `handleImageFileChange`.
+  - Added emerald compression feedback pill displaying original size vs WebP size and savings percentage.
+
+### Step 9: Production Build & Asset Verification
+- Executed `npm run build`:
+  - `tsc` completed with 0 errors.
+  - Vite transformed 2037 modules.
+  - Dynamic import successfully split `heic2any` into separate 1.35MB chunk (`dist/assets/heic2any-D5TVykDF.js`), leaving the main application bundle clean and fast (`952 KB`).
+  - Total build time: 45.31s. Exit code: 0.
+
+---
+*Signed by Agent Beta — Implementation Completed*

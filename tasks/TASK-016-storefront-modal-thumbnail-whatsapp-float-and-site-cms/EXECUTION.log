@@ -1,0 +1,46 @@
+# Phase C: Execution Trace — TASK-016
+
+> **Task ID:** `TASK-016-storefront-modal-thumbnail-whatsapp-float-and-site-cms`  
+> **Lifecycle Phase:** Phase C (Execution & Verification)  
+> **Implementer:** Agent Beta (Senior Full-Stack Implementer)  
+> **Timestamp:** 2026-10-09T06:29:40+03:00  
+
+---
+
+## Chronological Action Log
+
+1. **[Pre-flight Verification]**:
+   - Verified `tasks/TASK-016-storefront-modal-thumbnail-whatsapp-float-and-site-cms/SPEC.md`.
+   - Verified `public.site_content` table existence and schema in Supabase.
+   - Verified status in `tasks/INDEX.md` as in-progress.
+
+2. **[Phase B Complete]**:
+   - Authored `SKILLS_USED.md` mobilizing `storefront-best-practices`, `tailwind-design-system`, `design-mobile-apps`, and `vercel-react-best-practices`.
+
+3. **[Pillar 1: ProductDetailModal Refactor]**:
+   - Refactored `src/components/storefront/v0/ProductDetailModal.tsx`:
+   - Converted full-width hero banner into a compact square thumbnail lockup (`size-24 sm:size-32`) alongside dish title, English subtitle, price, unit, and portion capacity.
+   - Retained luxury image shimmer and hover micro-zoom.
+
+4. **[Pillar 2: Luxury Floating WhatsApp]**:
+   - Created `src/components/storefront/v0/FloatingWhatsApp.tsx`:
+   - Designed luxury circular button (`#25D366`) with ambient pulsing glow (`animate-pulse`).
+   - Placed at `bottom-24 sm:bottom-6 left-4 sm:left-6` with non-collision guard above `OrderBar`.
+   - Wired direct WhatsApp link to `966560602341` with pre-filled hospitable inquiry.
+   - Mounted in `src/App.tsx` on storefront customer views.
+
+5. **[Pillar 3: Site Content & Brand Assets CMS]**:
+   - Updated `src/types/admin.ts` with `site-content` in `AdminTab` and defined `SiteContentSettings`.
+   - Implemented `fetchSiteContent` and `saveSiteContent` in `src/services/adminService.ts`.
+   - Created `src/components/admin/modules/SiteContentModule.tsx`:
+     * Media section with 4 image uploaders/URL inputs and live previews.
+     * Copywriting section with smart real-time keyword search filter across all storefront copy.
+   - Added `Site Content` tab in `src/components/admin/MerchantSidebar.tsx` and mounted in `MerchantCenter.tsx`.
+
+6. **[Icon Refinement: Official WhatsApp Vector]**:
+   - Replaced generic chat icon in `FloatingWhatsApp.tsx` with the authentic, official WhatsApp brand SVG vector path (speech bubble with handset and signature curved tail).
+
+7. **[Build & Verification Pass]**:
+   - Executed `npx tsc --noEmit`: Clean exit code 0.
+   - Executed `npm run build`: `tsc && vite build` completed in 17.81s (`dist/assets/index-C3Dbf7QS.js`, `dist/assets/index-BFht5kkT.css`).
+   - Verified active dev server running cleanly at `http://localhost:5174/`.

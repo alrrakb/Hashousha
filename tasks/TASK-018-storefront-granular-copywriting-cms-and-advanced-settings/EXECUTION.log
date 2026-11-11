@@ -1,0 +1,72 @@
+# Phase C: Execution Log — TASK-018
+
+> **Task ID:** `TASK-018-storefront-granular-copywriting-cms-and-advanced-settings`  
+> **Phase:** Phase C (Execution & Verification Trace)  
+> **Assignee:** Agent Beta (Senior Full-Stack Implementer)  
+> **Status:** VERIFIED & EXECUTED  
+> **Date:** 2026-10-09  
+
+---
+
+## 1. Chronological Step Trace
+
+### Step 1: Governance & Phase Transition
+- Inspected `PROJECT_STATE.json` and transitioned authority to `AGENT_BETA` with `workflow_phase: "PHASE_B_SKILLS"`.
+- Mobilized autonomous skills and authored `SKILLS_USED.md` (Phase B).
+- Transitioned `workflow_phase` to `PHASE_C_EXECUTION`.
+
+### Step 2: Types & Contract Expansion (`src/types/admin.ts`)
+- Added `uiStrings?: Record<string, string>` to `SiteContentSettings`.
+- Authored and exported `DEFAULT_UI_STRINGS` covering all 28 granular micro-copy keys across:
+  - Cart & OrderBar (`orderBar.checkoutBtn`, `orderBar.itemsSuffix`, `orderBar.currency`)
+  - Checkout Modal structure & headers (`checkout.modalTitle`, `checkout.modalSubtitle`, `checkout.summaryTitle`)
+  - Coupon Engine (`checkout.couponLabel`, `checkout.couponPlaceholder`, `checkout.couponApplyBtn`)
+  - Customer Form fields & placeholders (`checkout.nameLabel`, `checkout.namePlaceholder`, `checkout.phoneLabel`, `checkout.phonePlaceholder`, `checkout.districtLabel`, `checkout.districtPlaceholder`, `checkout.addressLabel`, `checkout.addressPlaceholder`, `checkout.notesLabel`, `checkout.notesPlaceholder`)
+  - Payment Methods copy (`checkout.paymentCodTitle`, `checkout.paymentCodSubtitle`, `checkout.paymentTransferTitle`, `checkout.paymentTransferSubtitle`)
+  - Financial Summary (`checkout.subtotalTitle`, `checkout.deliveryFeeTitle`, `checkout.totalTitle`, `checkout.submitOrderBtn`)
+  - Dish details & action buttons (`dishModal.addToCartBtn`, `dishModal.soldOutBtn`, `dishModal.storyTitle`, `dishModal.pairingsTitle`)
+- Updated `DEFAULT_SITE_CONTENT` to include `uiStrings: DEFAULT_UI_STRINGS`.
+
+### Step 3: Cloud Persistence Synchronization (`src/services/adminService.ts`)
+- Added `ui_strings?: Record<string, string>` to `CloudSiteContentRow`.
+- Updated `fetchSiteContent()` to query `public.site_content` and merge `row.ui_strings` with `DEFAULT_UI_STRINGS`.
+- Updated `saveSiteContent()` to send `ui_strings: settings.uiStrings` to Supabase `public.site_content`.
+
+### Step 4: Centralized Storefront State Provider (`src/context/SiteContentContext.tsx`)
+- Created `SiteContentContext` and `SiteContentProvider` with memoized `t(key, fallback)` translation helper.
+- Implemented zero-flicker resilience: if key is empty/undefined, falls back to `DEFAULT_UI_STRINGS[key]`.
+- Wrapped `<SiteContentProvider>` at root level in `src/main.tsx`.
+
+### Step 5: Merchant Center "Advanced Settings" UI (`SiteContentModule.tsx`)
+- Grouped micro-copy into 4 panels in `ADVANCED_GROUPS`:
+  1. `cart-orderbar` (ShoppingBag)
+  2. `checkout-form` (FileText)
+  3. `payment-coupon` (CreditCard)
+  4. `dish-actions` (UtensilsCrossed)
+- Designed luxury collapsible accordion: **«الإعدادات المتقدمة: نصوص الواجهة الدقيقة (Micro-Copy)»**.
+- Implemented universal instant search:
+  - Searches both primary copy and advanced micro-copy fields.
+  - Automatically expands the accordion (`effectiveIsAdvancedOpen`) upon matching query.
+  - Highlights matching inputs with gold ring, glowing border, and `مطابق للبحث 🔍` badge.
+  - Provided instant "استعادة" button to revert any field to default.
+
+### Step 6: Storefront Component Binding
+- `src/components/storefront/v0/OrderBar.tsx`: Bound `t('orderBar.checkoutBtn', 'إتمام الطلب')`.
+- `src/components/checkout/CheckoutModal.tsx`: Bound modal title, subtitle, summary title, coupon labels, calculations, and submit CTA.
+- `src/components/checkout/CustomerForm.tsx`: Bound labels and placeholders for name, phone, district, address, and notes.
+- `src/components/checkout/PaymentSelector.tsx`: Bound titles and descriptions for COD and Bank Transfer.
+- `src/components/storefront/v0/ProductDetailModal.tsx`: Bound thumbnail sold-out badge, story title, and add-to-cart button.
+- `src/components/storefront/v0/Hero.tsx`: Converted to consume `useSiteContent` directly.
+
+---
+
+## 2. Compilation & Build Verification
+
+```powershell
+npm run build
+```
+**Result:**
+- Exit code: `0`
+- `tsc`: Zero TypeScript errors.
+- `vite build`: `2031 modules transformed` in 20.64s.
+- Bundle generated cleanly: `dist/assets/index-CJg8diXu.js` (828.06 kB).

@@ -1,0 +1,83 @@
+# Execution Log: TASK-021 — Artisanal Babka Catalog Migration & Assets
+
+> **Task ID:** `TASK-021-artisanal-babka-catalog-migration-and-assets`  
+> **Milestone:** Milestone 17 — Artisanal Babka Full Catalog Migration & Visual Assets Generation  
+> **Executor:** Agent Beta (Senior Full-Stack Implementer)  
+> **Start Time:** 2026-10-10T02:05:00+03:00  
+> **End Time:** 2026-10-10T02:45:00+03:00  
+
+---
+
+## Chronological Operations Trace
+
+### [02:05:15] Phase B: Skills Mobilization & Environmental Readiness
+- Mobilized `storefront-best-practices` (`.agents/skills/storefront-best-practices/`): Catalog layout, pricing in SAR, zero emoji, canonical slugs.
+- Mobilized `tailwind-design-system` (`.agents/skills/tailwind-design-system/`): Hotel-grade tokens, dark roast palettes, luxury badge presets.
+- Mobilized `vercel-react-best-practices` (`.agents/skills/vercel-react-best-practices/`): Type safety, bundle performance.
+- Authored `tasks/TASK-021-artisanal-babka-catalog-migration-and-assets/SKILLS_USED.md`.
+
+### [02:05:30 - 02:20:30] Phase C: Pillar 5 — Visual Assets Generation & Alignment
+- Generated hotel-grade studio photography assets via `generate_image` based on the official menu card (`public/images/official-menu-card.jpg`):
+  * `babka-mini-pesto.png`
+  * `babka-mini-cheese.png`
+  * `babka-mini-pizza.png`
+  * `babka-mini-zaatar-labneh.png`
+  * `babka-mini-nutella-pecan.png`
+  * `babka-mini-custard-chocolate.png`
+  * `babka-mini-cinnabon.png`
+  * `babka-family-zaatar-pizza-cheese.png`
+  * `babka-family-pesto.png`
+  * `babka-family-nutella-pecan.png`
+  * `babka-family-cinnabon-custard.png`
+  * `babka-medium-pesto.png`
+- Cropped and enhanced high-resolution matching photography from the official printed menu card for remaining items:
+  * `babka-medium-zaatar-pizza-cheese.png`
+  * `babka-medium-nutella-pecan.png`
+  * `babka-medium-cinnabon-custard.png`
+  * `babka-box-pesto-24.png`
+  * `babka-box-zaatar-pizza-cheese-24.png`
+  * `babka-box-nutella-pecan-24.png`
+  * `babka-box-cinnabon-custard-24.png`
+- All 19 assets validated in `public/images/dishes/babka-*.png`.
+
+### [02:21:00 - 02:27:00] Phase C: Pillars 1, 2, 3, 4, 6 — Types, Badges, SEO, WhatsApp
+- Updated `src/types/menu.ts`:
+  * Defined `CategoryId = "all" | "mini-babka" | "medium-babka" | "family-babka" | "babka-boxes"`.
+  * Expanded `BadgeKind` with `signature`, `savory`, `sweet`.
+- Updated `src/services/badgeService.ts`:
+  * Realiged default badges to: `popular` (Bestseller), `signature` (Signature Dish), `savory` (Artisanal Savory), `sweet` (Royal Sweet), `new` (New Bake).
+  * Added fallback mappings in `getBadgeDisplayConfig`.
+- Overhauled `src/data/menu.ts`:
+  * Wiped all legacy dishes (warak-enab, malfouf, trays, sweets).
+  * Injected complete dataset for 19 artisanal babka items across 4 categories with full culinary descriptions, serving tips, and SEO titles.
+  * Updated official WhatsApp constant: `WHATSAPP_NUMBER = "966598956580"`.
+- Updated `src/services/adminService.ts`:
+  * Aligned `DEFAULT_SEO_SETTINGS` to Riyadh Artisanal Babka Bakery metadata.
+  * Updated `DEFAULT_ADMIN_CATEGORIES` mapping.
+  * Changed fallback image to `/images/dishes/babka-mini-pesto.png`.
+- Updated `src/types/admin.ts`:
+  * Updated `DEFAULT_SITE_CONTENT` with brand slogans: "H A S H O U S H A — Sweet & Savory Bakes", "ترف البابكا والمخبوزات الفاخرة".
+  * Updated WhatsApp to `966598956580` and greeting message.
+- Updated `src/components/storefront/v0/FloatingWhatsApp.tsx`:
+  * Updated fallback phone to `966598956580`.
+- Updated `PROJECT_STATE.json`:
+  * Aligned `primary_whatsapp_channel: "966598956580"`.
+
+### [02:28:00 - 02:40:30] Phase C: Supabase Cloud Database Purge & Sync
+- Examined cloud database schema for `categories` and `dishes`.
+- Authored `tasks/TASK-021-artisanal-babka-catalog-migration-and-assets/migration.sql`.
+- Added RLS security policy allowing delete and full category operations:
+  * `CREATE POLICY "Public delete dishes" ON public.dishes FOR DELETE TO public USING (true);`
+  * `CREATE POLICY "Public all categories" ON public.categories FOR ALL TO public USING (true) WITH CHECK (true);`
+- Executed `scripts/sync-babka-catalog.ts` via `tsx`:
+  * Purged all legacy dishes (`warak-classic`, `warak-box`, `malfouf-spicy`, `kunafa-box`, `date-cake`, `majlis-tray`).
+  * Purged all legacy categories (`warak`, `malfouf`, `trays`, `sweets`).
+  * Synced 4 new categories (`mini-babka`, `medium-babka`, `family-babka`, `babka-boxes`).
+  * Synced all 19 Artisanal Babka items with prices, units, badges, and rich descriptions.
+- Cloud DB Verification Query Output:
+  * `Categories = 4`
+  * `Dishes = 19`
+
+### [02:43:00 - 02:44:20] Phase C: Build Verification Gate
+- Executed: `npm run build` (`tsc && vite build`).
+- Output: `Exit Code 0`, 2032 modules transformed, 0 TypeScript errors, 0 lint warnings.

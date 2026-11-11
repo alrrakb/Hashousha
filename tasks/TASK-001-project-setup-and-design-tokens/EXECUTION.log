@@ -1,0 +1,94 @@
+﻿# Chronological Execution Log — TASK-001
+
+> **Task ID:** `TASK-001-project-setup-and-design-tokens`  
+> **Assignee:** Agent Beta (Senior Implementer)  
+> **Started:** 2026-09-26T00:04:00+03:00  
+> **Completed:** 2026-09-26T00:08:40+03:00  
+
+---
+
+## 1. Phase B Mobilization — 2026-09-26T00:04:50+03:00
+- Analyzed `AGENT_RULES.md`, `tasks/INDEX.md`, and `tasks/TASK-001-project-setup-and-design-tokens/SPEC.md`.
+- Inspected design token scales and rules in `docs/DESIGN_SYSTEM.md`.
+- Inspected data contracts and architectural boundaries in `docs/SYSTEM_ARCHITECTURE.md`.
+- Verified runtime: Node.js `v22.20.0`, npm `10.9.3`.
+- Generated `tasks/TASK-001-project-setup-and-design-tokens/SKILLS_USED.md`.
+
+---
+
+## 2. Phase C Step-by-Step Execution Log
+
+### 2.1 Dependency Manifest Creation
+- **Action:** Created `package.json` with scripts (`dev`, `build`, `preview`) and core/dev dependencies:
+  - Core: `react`, `react-dom`, `lucide-react`, `zustand`, `framer-motion`, `clsx`, `tailwind-merge`
+  - Dev: `vite`, `@vitejs/plugin-react`, `typescript`, `@types/react`, `@types/react-dom`, `tailwindcss`, `postcss`, `autoprefixer`
+- **Command:** `npm install`
+- **Result:** Successfully installed 143 packages with exit code 0.
+
+### 2.2 Build & Tooling Configuration
+- **Action:** Configured `vite.config.ts` with React plugin and `@` path alias mapped to `./src`.
+- **Action:** Created `tsconfig.json` with strict TypeScript configuration, bundler module resolution, `@/*` path mapping, and DOM libraries.
+- **Action:** Created `tsconfig.node.json` for Vite configuration.
+- **Action:** Created `postcss.config.js` with `tailwindcss` and `autoprefixer`.
+
+### 2.3 Tailwind & Design Tokens Configuration
+- **Action:** Created `tailwind.config.js` injecting exact tokens from `docs/DESIGN_SYSTEM.md`:
+  - `olive`: 50, 100, 200, 500, 700, 800, 900, 950
+  - `pomegranate`: 50, 100, 500, 600, 700, 900
+  - `honey`: 50, 100, 500, 600, 800
+  - `ivory`: `#FDFBF7`
+  - `surface`: `warm` (`#FDFBF7`), `card` (`#FFFFFF`), `muted` (`#F7F4EC`), `border` (`#EAE4D7`)
+  - `text`: `primary` (`#1A1816`), `secondary` (`#4A453F`), `muted` (`#7D756C`), `on-dark` (`#FFFFFF`)
+  - Fonts: `sans`, `display`, `body`, `cairo`, `readex`
+  - Gourmet Shadows: `gourmet-sm`, `gourmet-md`, `gourmet-lg`, `gourmet-float`
+
+### 2.4 HTML Shell & RTL Styling
+- **Action:** Created `index.html` with:
+  - `<html lang="ar" dir="rtl">`
+  - Google Fonts preconnect and font links for `Cairo` (400, 500, 600, 700, 800, 900) & `Readex Pro` (400, 500, 600, 700)
+  - Mobile viewport & theme-color (`#173420`)
+  - Title: `هشوشة | محاشي وحلويات فاخرة`
+- **Action:** Created `src/index.css` with `@tailwind base`, `@tailwind components`, `@tailwind utilities`, and warm ivory scrollbar styling.
+
+### 2.5 Strict TypeScript Contracts
+- **Action:** Created `src/types/product.ts` (`Category`, `ProductOptionChoice`, `ProductOptionGroup`, `SpicyLevel`, `DishBadge`, `Product`).
+- **Action:** Created `src/types/cart.ts` (`SelectedChoiceRef`, `CartItem`, `CartSummary`).
+- **Action:** Created `src/types/store.ts` (`StoreSettings`, `CustomerOrderInfo`).
+- **Action:** Created `src/types/index.ts` re-export barrel.
+
+### 2.6 Core Constants & UI Components
+- **Action:** Created `src/constants/theme.ts` exporting JS constants for colors, shadows, and brand strings.
+- **Action:** Created `src/components/layout/Header.tsx` and `src/components/Header.tsx`:
+  - Glassmorphism sticky top bar (`backdrop-blur-md bg-surface-warm/95`)
+  - Top announcement ribbon with live status dot and operating hours
+  - Brand identity block (Arabic typography `هشوشة` + luxury subtitle + grape leaf emblem)
+  - Direct WhatsApp link and interactive cart counter trigger button.
+- **Action:** Created `src/App.tsx`: Interactive Design Token Validation board showcasing:
+  - Color swatches with hex values (Olive, Pomegranate, Honey, Surfaces)
+  - Typography hierarchy (Display 1 down to Meta labels in Cairo and Readex Pro)
+  - Gourmet badges (`الأكثر طلباً`, `حار مسمسم 🌶️`, `طبق جديد 🌿`, `خلطة سرية`)
+  - Tactile interactive action buttons with reactive cart state increment/decrement
+  - Gourmet shadow elevation matrix
+  - Complete prototype dish card with price formatting (`ر.س`).
+- **Action:** Created `src/main.tsx` mounting `App` inside `React.StrictMode`.
+
+### 2.7 Verification & Compilation
+- **Command:** `npm run build`
+- **Audit Findings:** Initial pass caught unused `ChevronLeft` import in `src/App.tsx` (strict TS error TS6133). Removed unused import.
+- **Re-run Command:** `npm run build`
+- **Output:**
+  ```text
+  > hashousha@1.0.0 build
+  > tsc && vite build
+
+  vite v5.4.21 building for production...
+  transforming...
+  ✓ 1570 modules transformed.
+  rendering chunks...
+  computing gzip size...
+  dist/index.html                   1.36 kB │ gzip:  0.82 kB
+  dist/assets/index-BjUAbqZg.css   25.97 kB │ gzip:  5.00 kB
+  dist/assets/index-CCiqmTMy.js   174.81 kB │ gzip: 52.81 kB
+  ✓ built in 50.95s
+  ```
+- **Exit Code:** 0 (Clean production build, zero errors, zero warnings).
