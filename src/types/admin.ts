@@ -321,7 +321,7 @@ export const DEFAULT_SITE_CONTENT: SiteContentSettings = {
   whatsappNumber: '966598956580',
   whatsappFloatingMessage: 'مرحباً هشوشة 🌿، أود الاستفسار بخصوص قائمة البابكا والمخبوزات الفاخرة ومواعيد التوصيل بالرياض...',
   whatsappFloatingEnabled: true,
-  darkModeEnabled: true,
+  darkModeEnabled: false,
   uiStrings: DEFAULT_UI_STRINGS,
   themeColors: DEFAULT_THEME_COLORS,
 }

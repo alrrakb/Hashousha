@@ -20,15 +20,11 @@ function getInitialTheme(): ThemeMode {
   if (typeof window !== 'undefined') {
     try {
       const stored = localStorage.getItem(THEME_STORAGE_KEY)
-      if (stored === 'light' || stored === 'dark') {
-        return stored
+      if (stored === 'dark') {
+        return 'dark'
       }
     } catch {
       // localStorage may be unavailable in restricted environments
-    }
-
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark'
     }
   }
   return 'light'
