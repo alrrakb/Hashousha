@@ -37,7 +37,7 @@ export function DishCard({ dish, onSelectDish }: DishCardProps) {
     <article
       onClick={handleCardClick}
       className={cn(
-        "group flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-primary/15 bg-card shadow-[0_1px_0_rgba(46,30,13,0.04),0_20px_40px_-24px_rgba(46,30,13,0.35)] dark:shadow-[0_1px_0_rgba(194,149,103,0.06),0_20px_40px_-24px_rgba(0,0,0,0.7)] transition-all",
+        "group flex h-full min-w-0 w-full flex-col overflow-hidden rounded-[1.75rem] border border-primary/15 bg-card shadow-[0_1px_0_rgba(46,30,13,0.04),0_20px_40px_-24px_rgba(46,30,13,0.35)] dark:shadow-[0_1px_0_rgba(194,149,103,0.06),0_20px_40px_-24px_rgba(0,0,0,0.7)] transition-all",
         onSelectDish && "cursor-pointer hover:border-primary/40 hover:shadow-xl"
       )}
     >

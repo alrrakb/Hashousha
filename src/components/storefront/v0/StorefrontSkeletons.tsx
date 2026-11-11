@@ -115,7 +115,7 @@ export const DishCardSkeleton: React.FC = () => {
 export const MenuGridSkeleton: React.FC<{ count?: number }> = ({ count = 6 }) => {
   return (
     <div
-      className="mx-auto grid w-full max-w-5xl gap-5 px-5 pt-6 sm:grid-cols-2 lg:grid-cols-3"
+      className="mx-auto grid grid-cols-1 w-full max-w-5xl gap-5 px-5 pt-6 sm:grid-cols-2 lg:grid-cols-3"
       aria-label="جاري تحميل الأطباق الفاخرة..."
     >
       {Array.from({ length: count }).map((_, i) => (

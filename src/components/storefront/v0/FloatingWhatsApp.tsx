@@ -83,7 +83,7 @@ export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({
         >
           {/* Subtle Heartbeat Ring Glow */}
           <span
-            className="absolute inset-0 rounded-full bg-[#25D366] opacity-30 animate-ping pointer-events-none"
+            className="absolute inset-0 rounded-full bg-[#25D366] opacity-30 animate-pulse pointer-events-none"
             aria-hidden="true"
           />
 

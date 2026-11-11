@@ -207,7 +207,7 @@ export const App: React.FC = () => {
   // 3. Public Pure Customer Storefront with In-Store Modal
   return (
     <CartProvider>
-      <div className="min-h-screen linen font-sans text-foreground selection:bg-primary/20 selection:text-foreground" dir="rtl">
+      <div className="min-h-screen linen font-sans text-foreground selection:bg-primary/20 selection:text-foreground overflow-x-hidden w-full" dir="rtl">
         <SiteHeader isLoading={isStorefrontLoading} />
         <main className="pb-40 sm:pb-48">
           <Hero isLoading={isStorefrontLoading} />
