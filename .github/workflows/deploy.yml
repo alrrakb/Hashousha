@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
@@ -35,4 +36,4 @@ jobs:
           SOURCE: "dist/"
           EXCLUDE: "/.git/, /node_modules/"
           SCRIPT_AFTER: |
-            sudo chown -R www-data:www-data /var/www/Hashousha/dist
+            chown -R www-data:www-data /var/www/Hashousha/dist
