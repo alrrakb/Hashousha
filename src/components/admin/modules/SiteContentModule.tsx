@@ -403,6 +403,15 @@ export const SiteContentModule: React.FC = () => {
     if (advCount > 0) {
       setIsAdvancedOpen(true)
     }
+
+    if (q) {
+      setTimeout(() => {
+        const el = document.getElementById('search-results-anchor')
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }, 100)
+    }
   }
 
   const handleClearSearch = () => {
@@ -533,6 +542,36 @@ export const SiteContentModule: React.FC = () => {
     return footerMatchesCount > 0
   }, [appliedSearch, footerMatchesCount])
 
+  // Dynamic Section Reordering: Any section with matches takes the lead ("يتصدر الصفحة")
+  type SectionId = 'hero' | 'pillars' | 'footer' | 'advanced'
+
+  const orderedSections = useMemo(() => {
+    const defaultSections: SectionId[] = ['hero', 'pillars', 'footer', 'advanced']
+    if (!appliedSearch) return defaultSections
+
+    const matchScore: Record<SectionId, boolean> = {
+      hero: heroMatchesCount > 0,
+      pillars: pillarsMatchesCount > 0,
+      footer: footerMatchesCount > 0,
+      advanced: hasActiveAdvancedSearch,
+    }
+
+    const matched = defaultSections.filter((id) => matchScore[id])
+    const unmatched = defaultSections.filter((id) => !matchScore[id])
+
+    return [...matched, ...unmatched]
+  }, [appliedSearch, heroMatchesCount, pillarsMatchesCount, footerMatchesCount, hasActiveAdvancedSearch])
+
+  // Dynamic Advanced Groups Ordering: Groups containing matches take the lead inside the accordion
+  const orderedAdvancedGroups = useMemo(() => {
+    if (!appliedSearch) return ADVANCED_GROUPS
+
+    const withMatches = ADVANCED_GROUPS.filter((g) => g.fields.some(isFieldMatched))
+    const withoutMatches = ADVANCED_GROUPS.filter((g) => !g.fields.some(isFieldMatched))
+
+    return [...withMatches, ...withoutMatches]
+  }, [appliedSearch, matchedKeysSnapshot])
+
   const pillarIcons = [ChefHat, Droplets, Gift, Truck]
 
   if (loading) {
@@ -545,7 +584,7 @@ export const SiteContentModule: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6 pb-24" dir="rtl">
+    <div className="space-y-6 pb-36" dir="rtl">
       {/* Header and Sub-Tab Navigation */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-primary/10 pb-5">
         <div>
@@ -1049,24 +1088,42 @@ export const SiteContentModule: React.FC = () => {
             </div>
           )}
 
-          {/* Section 2.1: Hero Section Copywriting */}
-          {heroSectionVisible && (
-            <div className="rounded-3xl border border-primary/15 bg-card p-5 sm:p-7 shadow-sm space-y-5">
-              <div className="flex items-center justify-between border-b border-primary/10 pb-3">
-                <div className="flex items-center gap-2.5">
-                  <span className="p-1.5 rounded-lg bg-primary/10 text-primary">
-                    <Sparkles className="size-4" />
-                  </span>
-                  <h2 className="text-base font-black text-foreground">نصوص وعناوين الهيرو سيكشن (Hero Showcase)</h2>
-                </div>
-                {appliedSearch && heroMatchesCount > 0 && (
-                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 dark:bg-emerald-950/50 dark:text-emerald-300 px-2 py-0.5 rounded-md">
-                    {heroMatchesCount} نتيجة
-                  </span>
-                )}
-              </div>
+                    {/* Dynamic Sections Wrapper (Ordered: Matched Sections Lead the Page) */}
+          <div id="search-results-anchor" className="space-y-6">
+            {orderedSections.map((sectionId) => {
+              if (sectionId === 'hero') {
+                if (!heroSectionVisible) return null
+                const isHeroLeading = appliedSearch.length > 0 && heroMatchesCount > 0
+                return (
+                  <div
+                    key="section-hero"
+                    className={cn(
+                      'rounded-3xl border bg-card p-5 sm:p-7 shadow-sm space-y-5 transition-all',
+                      isHeroLeading ? 'border-primary ring-2 ring-primary/20 bg-amber-50/10 dark:bg-amber-950/10' : 'border-primary/15'
+                    )}
+                  >
+                    <div className="flex items-center justify-between border-b border-primary/10 pb-3">
+                      <div className="flex items-center gap-2.5">
+                        <span className="p-1.5 rounded-lg bg-primary/10 text-primary">
+                          <Sparkles className="size-4" />
+                        </span>
+                        <h2 className="text-base font-black text-foreground">نصوص وعناوين الهيرو سيكشن (Hero Showcase)</h2>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {isHeroLeading && (
+                          <span className="text-[10px] font-bold text-amber-800 bg-amber-100 dark:bg-amber-950/60 dark:text-amber-300 px-2.5 py-0.5 rounded-md border border-amber-300/40">
+                            متصدر نتائج البحث 🚀
+                          </span>
+                        )}
+                        {appliedSearch && heroMatchesCount > 0 && (
+                          <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 dark:bg-emerald-950/50 dark:text-emerald-300 px-2 py-0.5 rounded-md">
+                            {heroMatchesCount} نتيجة
+                          </span>
+                        )}
+                      </div>
+                    </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* heroTag */}
                 <div
                   className={cn(
@@ -1208,27 +1265,43 @@ export const SiteContentModule: React.FC = () => {
                   />
                 </div>
               </div>
-            </div>
-          )}
+                  </div>
+                )
+              }
 
-          {/* Section 2.2: 4 Brand Pillars */}
-          {pillarsSectionVisible && (
-            <div className="rounded-3xl border border-primary/15 bg-card p-5 sm:p-7 shadow-sm space-y-5">
-              <div className="flex items-center justify-between border-b border-primary/10 pb-3">
-                <div className="flex items-center gap-2.5">
-                  <span className="p-1.5 rounded-lg bg-primary/10 text-primary">
-                    <Gift className="size-4" />
-                  </span>
-                  <h2 className="text-base font-black text-foreground">ركائز الضيافة الفاخرة الأربع (Brand Pillars)</h2>
-                </div>
-                {appliedSearch && pillarsMatchesCount > 0 && (
-                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 dark:bg-emerald-950/50 dark:text-emerald-300 px-2 py-0.5 rounded-md">
-                    {pillarsMatchesCount} نتيجة
-                  </span>
-                )}
-              </div>
+              if (sectionId === 'pillars') {
+                if (!pillarsSectionVisible) return null
+                const isPillarsLeading = appliedSearch.length > 0 && pillarsMatchesCount > 0
+                return (
+                  <div
+                    key="section-pillars"
+                    className={cn(
+                      'rounded-3xl border bg-card p-5 sm:p-7 shadow-sm space-y-5 transition-all',
+                      isPillarsLeading ? 'border-primary ring-2 ring-primary/20 bg-amber-50/10 dark:bg-amber-950/10' : 'border-primary/15'
+                    )}
+                  >
+                    <div className="flex items-center justify-between border-b border-primary/10 pb-3">
+                      <div className="flex items-center gap-2.5">
+                        <span className="p-1.5 rounded-lg bg-primary/10 text-primary">
+                          <Gift className="size-4" />
+                        </span>
+                        <h2 className="text-base font-black text-foreground">ركائز الضيافة الفاخرة الأربع (Brand Pillars)</h2>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {isPillarsLeading && (
+                          <span className="text-[10px] font-bold text-amber-800 bg-amber-100 dark:bg-amber-950/60 dark:text-amber-300 px-2.5 py-0.5 rounded-md border border-amber-300/40">
+                            متصدر نتائج البحث 🚀
+                          </span>
+                        )}
+                        {appliedSearch && pillarsMatchesCount > 0 && (
+                          <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 dark:bg-emerald-950/50 dark:text-emerald-300 px-2 py-0.5 rounded-md">
+                            {pillarsMatchesCount} نتيجة
+                          </span>
+                        )}
+                      </div>
+                    </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {content.pillars.map((pillar, idx) => {
                   const Icon = pillarIcons[idx % pillarIcons.length]
                   const isTitleMatch = isKeyMatched(`pillar_${idx}_title`)
@@ -1300,27 +1373,43 @@ export const SiteContentModule: React.FC = () => {
                   )
                 })}
               </div>
-            </div>
-          )}
+                  </div>
+                )
+              }
 
-          {/* Section 2.3: Footer & Delivery Guarantees */}
-          {footerSectionVisible && (
-            <div className="rounded-3xl border border-primary/15 bg-card p-5 sm:p-7 shadow-sm space-y-5">
-              <div className="flex items-center justify-between border-b border-primary/10 pb-3">
-                <div className="flex items-center gap-2.5">
-                  <span className="p-1.5 rounded-lg bg-primary/10 text-primary">
-                    <Truck className="size-4" />
-                  </span>
-                  <h2 className="text-base font-black text-foreground">نصوص الفوتر ورسائل التوصيل (Footer & Guarantees)</h2>
-                </div>
-                {appliedSearch && footerMatchesCount > 0 && (
-                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 dark:bg-emerald-950/50 dark:text-emerald-300 px-2 py-0.5 rounded-md">
-                    {footerMatchesCount} نتيجة
-                  </span>
-                )}
-              </div>
+              if (sectionId === 'footer') {
+                if (!footerSectionVisible) return null
+                const isFooterLeading = appliedSearch.length > 0 && footerMatchesCount > 0
+                return (
+                  <div
+                    key="section-footer"
+                    className={cn(
+                      'rounded-3xl border bg-card p-5 sm:p-7 shadow-sm space-y-5 transition-all',
+                      isFooterLeading ? 'border-primary ring-2 ring-primary/20 bg-amber-50/10 dark:bg-amber-950/10' : 'border-primary/15'
+                    )}
+                  >
+                    <div className="flex items-center justify-between border-b border-primary/10 pb-3">
+                      <div className="flex items-center gap-2.5">
+                        <span className="p-1.5 rounded-lg bg-primary/10 text-primary">
+                          <Truck className="size-4" />
+                        </span>
+                        <h2 className="text-base font-black text-foreground">نصوص الفوتر ورسائل التوصيل (Footer & Guarantees)</h2>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {isFooterLeading && (
+                          <span className="text-[10px] font-bold text-amber-800 bg-amber-100 dark:bg-amber-950/60 dark:text-amber-300 px-2.5 py-0.5 rounded-md border border-amber-300/40">
+                            متصدر نتائج البحث 🚀
+                          </span>
+                        )}
+                        {appliedSearch && footerMatchesCount > 0 && (
+                          <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 dark:bg-emerald-950/50 dark:text-emerald-300 px-2 py-0.5 rounded-md">
+                            {footerMatchesCount} نتيجة
+                          </span>
+                        )}
+                      </div>
+                    </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div
                   className={cn(
                     'rounded-xl border p-3.5 space-y-1.5 transition-all',
@@ -1402,11 +1491,20 @@ export const SiteContentModule: React.FC = () => {
                   />
                 </div>
               </div>
-            </div>
-          )}
+                  </div>
+                )
+              }
 
-          {/* Section 2.4: Collapsible Advanced Settings Chamber (الإعدادات المتقدمة) */}
-          <div className="rounded-3xl border border-primary/20 bg-card shadow-sm overflow-hidden transition-all">
+              if (sectionId === 'advanced') {
+                const isAdvancedLeading = appliedSearch.length > 0 && hasActiveAdvancedSearch
+                return (
+                  <div
+                    key="section-advanced"
+                    className={cn(
+                      'rounded-3xl border bg-card shadow-sm overflow-hidden transition-all',
+                      isAdvancedLeading ? 'border-primary ring-2 ring-primary/20' : 'border-primary/20'
+                    )}
+                  >
             {/* Accordion Trigger Header */}
             <button
               type="button"
@@ -1426,6 +1524,11 @@ export const SiteContentModule: React.FC = () => {
                     <span className="text-[10px] bg-primary/15 text-primary font-bold px-2 py-0.5 rounded-full">
                       تحكم شامل
                     </span>
+                    {isAdvancedLeading && (
+                      <span className="text-[10px] bg-amber-500/20 text-amber-900 dark:text-amber-200 font-black px-2.5 py-0.5 rounded-full border border-amber-500/30 animate-pulse">
+                        متصدر الصفحة 🚀
+                      </span>
+                    )}
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     تعديل نصوص أزرار السلة، حقول وPlaceholders نافذة الشيك أوت، كوبونات الخصم، طرق الدفع، بطاقات الأطباق، نافذة التفاصيل، وصفحات الهبوط.
@@ -1451,18 +1554,32 @@ export const SiteContentModule: React.FC = () => {
             {/* Accordion Body: The 4 Categorized Panels */}
             {effectiveIsAdvancedOpen && (
               <div className="p-5 sm:p-7 space-y-8 animate-in fade-in duration-300">
-                {ADVANCED_GROUPS.map((group) => {
+                {orderedAdvancedGroups.map((group) => {
                   const GroupIcon = group.icon
                   const groupFields = group.fields
                   const matchedFieldsInGroup = groupFields.filter(isFieldMatched)
                   const isGroupDimmed = appliedSearch.length > 0 && matchedFieldsInGroup.length === 0
+                  const isGroupLeading = appliedSearch.length > 0 && matchedFieldsInGroup.length > 0
+
+                  // Sort fields inside group: matched fields first!
+                  const sortedGroupFields = appliedSearch.length > 0
+                    ? [...group.fields].sort((a, b) => {
+                        const aMatch = isFieldMatched(a) ? 1 : 0
+                        const bMatch = isFieldMatched(b) ? 1 : 0
+                        return bMatch - aMatch
+                      })
+                    : group.fields
 
                   return (
                     <div
                       key={group.id}
                       className={cn(
-                        'rounded-2xl border border-primary/15 bg-card/60 p-5 space-y-4 transition-all',
-                        isGroupDimmed && 'opacity-40 grayscale-[40%]'
+                        'rounded-2xl border p-5 space-y-4 transition-all',
+                        isGroupLeading
+                          ? 'border-primary ring-2 ring-primary/20 bg-amber-50/20 dark:bg-amber-950/15 shadow-sm'
+                          : isGroupDimmed
+                          ? 'border-primary/10 bg-card/40 opacity-40 grayscale-[40%]'
+                          : 'border-primary/15 bg-card/60'
                       )}
                     >
                       {/* Group Header */}
@@ -1472,7 +1589,14 @@ export const SiteContentModule: React.FC = () => {
                             <GroupIcon className="size-4" />
                           </span>
                           <div>
-                            <h4 className="text-sm font-black text-foreground">{group.title}</h4>
+                            <div className="flex items-center gap-2">
+                              <h4 className="text-sm font-black text-foreground">{group.title}</h4>
+                              {isGroupLeading && (
+                                <span className="text-[10px] font-bold text-amber-800 bg-amber-100 dark:bg-amber-950/60 dark:text-amber-300 px-2 py-0.5 rounded-md border border-amber-300/40">
+                                  متصدر القسم 🚀
+                                </span>
+                              )}
+                            </div>
                             <p className="text-[11px] text-muted-foreground">{group.description}</p>
                           </div>
                         </div>
@@ -1485,7 +1609,7 @@ export const SiteContentModule: React.FC = () => {
 
                       {/* Fields Grid */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {groupFields.map((field) => {
+                        {sortedGroupFields.map((field) => {
                           const isMatch = isFieldMatched(field)
                           const currentValue = getUiStringValue(field.key)
                           const isCustomized = currentValue !== DEFAULT_UI_STRINGS[field.key]
@@ -1548,6 +1672,12 @@ export const SiteContentModule: React.FC = () => {
                 })}
               </div>
             )}
+          </div>
+                )
+              }
+
+              return null
+            })}
           </div>
         </div>
       )}
@@ -2430,49 +2560,51 @@ export const SiteContentModule: React.FC = () => {
         </div>
       )}
 
-      {/* Sticky Bottom Save Action Bar */}
-      <div className="sticky bottom-4 z-30 flex items-center justify-between gap-3 p-4 rounded-2xl border border-primary/20 bg-[#2e1e0d] text-[#FAF7F2] shadow-2xl backdrop-blur-md">
-        <div className="flex items-center gap-2">
+      {/* Fixed Bottom Save Action Bar — Always visible across viewport */}
+      <div className="fixed inset-x-0 bottom-0 z-40 p-3 sm:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:right-64 lg:left-0 pointer-events-none transition-all">
+        <div className="max-w-5xl mx-auto flex items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl border border-primary/30 bg-[#2e1e0d]/95 dark:bg-[#1a120b]/95 text-[#FAF7F2] shadow-[0_12px_40px_rgba(0,0,0,0.5)] backdrop-blur-md pointer-events-auto ring-1 ring-white/10">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={loadSettings}
+              disabled={saving}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-[#FAF7F2] transition-all active:scale-95 cursor-pointer"
+              title="إعادة تحميل من السحابة"
+            >
+              <RefreshCw className={cn('size-3.5', loading && 'animate-spin')} />
+              <span className="hidden sm:inline">إعادة تحميل</span>
+            </button>
+            <a
+              href="/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-[#FAF7F2] transition-all active:scale-95 cursor-pointer"
+              title="معاينة المتجر"
+            >
+              <ExternalLink className="size-3.5" />
+              <span className="hidden sm:inline">معاينة المتجر</span>
+            </a>
+          </div>
+
           <button
             type="button"
-            onClick={loadSettings}
+            onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs text-[#FAF7F2] transition-all"
-            title="إعادة تحميل من السحابة"
+            className="flex items-center gap-2 px-5 sm:px-7 py-2.5 rounded-xl bg-primary text-primary-foreground font-black text-xs sm:text-sm hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-primary/25 cursor-pointer"
           >
-            <RefreshCw className="size-3.5" />
-            <span className="hidden sm:inline">إعادة تحميل</span>
+            {saving ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                <span>جاري الحفظ السحابي...</span>
+              </>
+            ) : (
+              <>
+                <Save className="size-4" />
+                <span>حفظ كافة تعديلات المظهر والمحتوى</span>
+              </>
+            )}
           </button>
-          <a
-            href="/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs text-[#FAF7F2] transition-all"
-            title="معاينة المتجر"
-          >
-            <ExternalLink className="size-3.5" />
-            <span className="hidden sm:inline">معاينة المتجر</span>
-          </a>
         </div>
-
-        <button
-          type="button"
-          onClick={handleSave}
-          disabled={saving}
-          className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-black text-xs sm:text-sm hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-primary/20"
-        >
-          {saving ? (
-            <>
-              <Loader2 className="size-4 animate-spin" />
-              <span>جاري الحفظ السحابي...</span>
-            </>
-          ) : (
-            <>
-              <Save className="size-4" />
-              <span>حفظ كافة تعديلات المظهر والمحتوى</span>
-            </>
-          )}
-        </button>
       </div>
     </div>
   )
