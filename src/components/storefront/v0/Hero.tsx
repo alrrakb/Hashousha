@@ -33,8 +33,8 @@ export const BRAND_PILLARS: BrandPillar[] = [
   },
   {
     icon: Truck,
-    title: 'توصيل مجهّز بالرياض',
-    subtitle: 'سيارات مبردة لحفظ الطراوة',
+    title: 'توصيل سريع بالرياض',
+    subtitle: 'لحفظ الطراوة والجودة الطازجة',
   },
 ]
 

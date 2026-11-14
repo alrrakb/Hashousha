@@ -115,7 +115,7 @@ const ADVANCED_GROUPS: AdvancedGroup[] = [
       { key: 'checkout.couponPlaceholder', label: 'نص إرشاد كود الخصم (Placeholder)', placeholder: 'مثال: RAMADAN10 أو HASH20' },
       { key: 'checkout.couponApplyBtn', label: 'زر تطبيق الكود', placeholder: 'تطبيق' },
       { key: 'checkout.subtotalTitle', label: 'تسمية المجموع الفرعي', placeholder: 'المجموع الفرعي' },
-      { key: 'checkout.deliveryFeeTitle', label: 'تسمية رسوم التوصيل المجهز', placeholder: 'توصيل مجهّز (سيارات مبردة)' },
+      { key: 'checkout.deliveryFeeTitle', label: 'تسمية رسوم التوصيل السريع', placeholder: 'توصيل سريع بالرياض' },
       { key: 'checkout.totalTitle', label: 'تسمية الإجمالي النهائي', placeholder: 'الإجمالي النهائي' },
       { key: 'checkout.submitOrderBtn', label: 'زر تأكيد الطلب بالواتساب', placeholder: 'تأكيد الطلب' },
     ],
@@ -166,7 +166,7 @@ const ADVANCED_GROUPS: AdvancedGroup[] = [
       { key: 'dishModal.highlightFresh', label: 'ميزة التحضير اليومي الطازج', placeholder: 'تحضير طازج يومياً بالرياض' },
       { key: 'dishModal.highlightIngredients', label: 'ميزة زيت الزيتون ودبس الرمان', placeholder: 'زيت زيتون بكر ودبس رمان أصلي' },
       { key: 'dishModal.highlightPackaging', label: 'ميزة التغليف الحراري الخاص', placeholder: 'تغليف حراري مخصص للجمعات' },
-      { key: 'dishModal.highlightDelivery', label: 'ميزة التوصيل الفوري بسيارات مجهزة', placeholder: 'توصيل فوري بسيارات مجهزة' },
+      { key: 'dishModal.highlightDelivery', label: 'ميزة التوصيل الفوري لكافة أحياء الرياض', placeholder: 'توصيل فوري لكافة أحياء الرياض' },
       { key: 'dishModal.pairingsTitle', label: 'عنوان توصية الأطباق المكملة', placeholder: 'أطباق تكمّل جمعتكم' },
     ],
   },
@@ -2545,7 +2545,7 @@ export const SiteContentModule: React.FC = () => {
                           color: pColors.primary,
                         }}
                       >
-                        توصيل مجهّز لجميع أحياء الرياض 🚚
+                        توصيل سريع لجميع أحياء الرياض 🚚
                       </div>
                     </div>
                   )

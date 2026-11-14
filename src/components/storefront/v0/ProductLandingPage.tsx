@@ -42,7 +42,7 @@ const HIGHLIGHT_CONFIG = [
   { key: 'fresh', uiKey: 'dishModal.highlightFresh', defaultLabel: 'تحضير طازج يومياً بالرياض' },
   { key: 'ingredients', uiKey: 'dishModal.highlightIngredients', defaultLabel: 'زيت زيتون بكر ودبس رمان أصلي' },
   { key: 'packaging', uiKey: 'dishModal.highlightPackaging', defaultLabel: 'تغليف حراري مخصص للجمعات' },
-  { key: 'delivery', uiKey: 'dishModal.highlightDelivery', defaultLabel: 'توصيل فوري بسيارات مجهزة' },
+  { key: 'delivery', uiKey: 'dishModal.highlightDelivery', defaultLabel: 'توصيل فوري لكافة أحياء الرياض' },
 ] as const
 
 export interface ProductLandingPageProps {
@@ -481,8 +481,8 @@ export const ProductLandingPage: React.FC<ProductLandingPageProps> = ({
               </div>
               <div className="space-y-1 p-2 rounded-xl bg-background/60 border border-border/50">
                 <Truck className="size-4 sm:size-5 text-primary mx-auto" />
-                <p className="text-[11px] font-bold text-foreground">توصيل مجهز ومبرد</p>
-                <p className="text-[9px] text-muted-foreground leading-tight">سيارات مبردة لحفظ طراوة الأطباق بالرياض</p>
+                <p className="text-[11px] font-bold text-foreground">توصيل سريع بالرياض</p>
+                <p className="text-[9px] text-muted-foreground leading-tight">توصيل يومي طازج لكافة أحياء الرياض</p>
               </div>
               <div className="space-y-1 p-2 rounded-xl bg-background/60 border border-border/50">
                 <Gift className="size-4 sm:size-5 text-primary mx-auto" />

@@ -38,7 +38,7 @@ const HIGHLIGHT_CONFIG = [
   { key: 'fresh', uiKey: 'dishModal.highlightFresh', defaultLabel: 'تحضير طازج يومياً بالرياض' },
   { key: 'ingredients', uiKey: 'dishModal.highlightIngredients', defaultLabel: 'زيت زيتون بكر ودبس رمان أصلي' },
   { key: 'packaging', uiKey: 'dishModal.highlightPackaging', defaultLabel: 'تغليف حراري مخصص للجمعات' },
-  { key: 'delivery', uiKey: 'dishModal.highlightDelivery', defaultLabel: 'توصيل فوري بسيارات مجهزة' },
+  { key: 'delivery', uiKey: 'dishModal.highlightDelivery', defaultLabel: 'توصيل فوري لكافة أحياء الرياض' },
 ] as const
 
 export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({

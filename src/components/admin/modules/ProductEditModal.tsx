@@ -106,8 +106,8 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
     },
     {
       key: 'delivery',
-      label: t('dishModal.highlightDelivery', 'توصيل فوري بسيارات مجهزة'),
-      hint: 'ضمان وصول الطلب بحالته المثالية عبر أسطول النقل المجهز بالرياض',
+      label: t('dishModal.highlightDelivery', 'توصيل فوري لكافة أحياء الرياض'),
+      hint: 'ضمان وصول الطلب بحالته المثالية وطازجاً لكافة أحياء الرياض',
     },
   ]
 

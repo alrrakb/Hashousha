@@ -251,7 +251,7 @@ export const DEFAULT_UI_STRINGS: Record<string, string> = {
   'checkout.couponPlaceholder': 'مثال: RAMADAN10 أو HASH20',
   'checkout.couponApplyBtn': 'تطبيق',
   'checkout.subtotalTitle': 'المجموع الفرعي',
-  'checkout.deliveryFeeTitle': 'توصيل مجهّز (سيارات مبردة)',
+  'checkout.deliveryFeeTitle': 'توصيل سريع بالرياض',
   'checkout.totalTitle': 'الإجمالي النهائي',
   'checkout.submitOrderBtn': 'تأكيد الطلب',
 
@@ -285,7 +285,7 @@ export const DEFAULT_UI_STRINGS: Record<string, string> = {
   'dishModal.highlightFresh': 'تحضير طازج يومياً بالرياض',
   'dishModal.highlightIngredients': 'زيت زيتون بكر ودبس رمان أصلي',
   'dishModal.highlightPackaging': 'تغليف حراري مخصص للجمعات',
-  'dishModal.highlightDelivery': 'توصيل فوري بسيارات مجهزة',
+  'dishModal.highlightDelivery': 'توصيل فوري لكافة أحياء الرياض',
 
   // 7. Dedicated Product Landing Page & Riyadh Reviews (11)
   'landing.backToCatalog': 'تصفح كامل أطباق هشوشة',
@@ -315,11 +315,11 @@ export const DEFAULT_SITE_CONTENT: SiteContentSettings = {
     { title: 'عجين بريوش مخمر ببطء', subtitle: 'طحين فاخر وزبدة نقية طازجة' },
     { title: 'حشوات غنية وأصيلة', subtitle: 'نوتيلا وبيكان، بيستو، وأجبان معتقة' },
     { title: 'تقديم وإهداء يبيّض الوجه', subtitle: 'بوكسات فندقية أنيقة للمجالس' },
-    { title: 'توصيل مجهّز بالرياض', subtitle: 'سيارات مبردة لحفظ الطراوة والدفء' },
+    { title: 'توصيل سريع بالرياض', subtitle: 'لحفظ الطراوة والجودة الطازجة' },
   ],
   footerTitle: 'هشوشة',
   footerSubtitle: 'H A S H O U S H A — Sweet & Savory Bakes · الرياض، المملكة العربية السعودية',
-  deliveryNotice: 'التوصيل متوفر لجميع أحياء الرياض بسيارات مجهزة ومبردة',
+  deliveryNotice: 'التوصيل متوفر لجميع أحياء الرياض يومياً وبكل سرعة',
   // Bank Account Defaults
   bankName: 'مصرف الراجحي (Al Rajhi Bank)',
   bankAccountName: 'مؤسسة هشوشة للأطعمة الفاخرة',

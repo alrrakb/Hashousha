@@ -4,6 +4,7 @@ import { useCart } from '../../cart-context'
 import { useSiteContent } from '../../../context/SiteContentContext'
 import { formatPrice } from '../../../data/menu'
 import { cn } from '../../../lib/utils'
+import { FreeDeliveryProgressBar } from './FreeDeliveryProgressBar'
 
 export interface OrderBarProps {
   onOpenCheckout?: () => void
@@ -31,60 +32,84 @@ export function OrderBar({ onOpenCheckout }: OrderBarProps = {}) {
           aria-label="شريط الطلب السريع"
         >
           <div className="mx-auto max-w-xl pointer-events-auto overflow-hidden rounded-[1.75rem] border border-primary/25 bg-[#231b14] dark:bg-[#1a130c] text-[#faf7f2] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.7)]">
+            {/* Top ambient micro-progress bar when collapsed */}
+            {!open && (
+              <div className="h-1 w-full bg-white/10 overflow-hidden">
+                <div
+                  className={cn(
+                    "h-full transition-all duration-500",
+                    totalPrice >= 150
+                      ? "bg-gradient-to-l from-emerald-400 to-amber-400 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
+                      : "bg-gradient-to-l from-amber-400 via-[#c29567] to-[#9e774c]"
+                  )}
+                  style={{ width: `${Math.min(100, Math.round((totalPrice / 150) * 100))}%` }}
+                />
+              </div>
+            )}
+
             <AnimatePresence initial={false}>
               {open && (
-                <motion.ul
-                  id="order-summary"
+                <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                  className="max-h-64 divide-y divide-white/10 dark:divide-primary/15 overflow-y-auto px-4 pt-3"
+                  className="overflow-hidden"
                 >
-                  {lines.map(({ lineKey, dish, variant, quantity, unitPrice }) => (
-                    <motion.li
-                      layout
-                      key={lineKey}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      className="flex items-center justify-between gap-3 py-2.5"
-                    >
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold">
-                          {dish.name}
-                          {variant && (
-                            <span className="text-xs font-normal text-[#E9D3B4]/80 dark:text-primary/80 mr-1.5">
-                              ({variant.name})
-                            </span>
-                          )}
-                        </p>
-                        <p className="text-xs text-[#E9D3B4] dark:text-primary">{formatPrice(unitPrice * quantity)}</p>
-                      </div>
-                      <div className="flex items-center gap-1 rounded-full bg-white/10 dark:bg-primary/10 p-0.5">
-                        <motion.button
-                          whileTap={{ scale: 0.85 }}
-                          type="button"
-                          onClick={() => add(dish.id, variant?.id)}
-                          aria-label={`زيادة ${dish.name}`}
-                          className="flex size-7 items-center justify-center rounded-full hover:bg-white/15 dark:hover:bg-primary/20 transition-colors"
-                        >
-                          <Plus className="size-3.5" />
-                        </motion.button>
-                        <span className="min-w-5 text-center text-sm font-bold">{quantity.toLocaleString("ar-SA")}</span>
-                        <motion.button
-                          whileTap={{ scale: 0.85 }}
-                          type="button"
-                          onClick={() => remove(dish.id, variant?.id)}
-                          aria-label={`إنقاص ${dish.name}`}
-                          className="flex size-7 items-center justify-center rounded-full hover:bg-white/15 dark:hover:bg-primary/20 transition-colors"
-                        >
-                          <Minus className="size-3.5" />
-                        </motion.button>
-                      </div>
-                    </motion.li>
-                  ))}
-                </motion.ul>
+                  {/* Interactive Free Delivery Incentive */}
+                  <div className="p-3 pb-2 border-b border-white/10 dark:border-primary/15">
+                    <FreeDeliveryProgressBar totalPrice={totalPrice} compact />
+                  </div>
+
+                  <ul
+                    id="order-summary"
+                    className="max-h-60 divide-y divide-white/10 dark:divide-primary/15 overflow-y-auto px-4 pt-1"
+                  >
+                    {lines.map(({ lineKey, dish, variant, quantity, unitPrice }) => (
+                      <motion.li
+                        layout
+                        key={lineKey}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        className="flex items-center justify-between gap-3 py-2.5"
+                      >
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold">
+                            {dish.name}
+                            {variant && (
+                              <span className="text-xs font-normal text-[#E9D3B4]/80 dark:text-primary/80 mr-1.5">
+                                ({variant.name})
+                              </span>
+                            )}
+                          </p>
+                          <p className="text-xs text-[#E9D3B4] dark:text-primary">{formatPrice(unitPrice * quantity)}</p>
+                        </div>
+                        <div className="flex items-center gap-1 rounded-full bg-white/10 dark:bg-primary/10 p-0.5">
+                          <motion.button
+                            whileTap={{ scale: 0.85 }}
+                            type="button"
+                            onClick={() => add(dish.id, variant?.id)}
+                            aria-label={`زيادة ${dish.name}`}
+                            className="flex size-7 items-center justify-center rounded-full hover:bg-white/15 dark:hover:bg-primary/20 transition-colors"
+                          >
+                            <Plus className="size-3.5" />
+                          </motion.button>
+                          <span className="min-w-5 text-center text-sm font-bold">{quantity.toLocaleString("ar-SA")}</span>
+                          <motion.button
+                            whileTap={{ scale: 0.85 }}
+                            type="button"
+                            onClick={() => remove(dish.id, variant?.id)}
+                            aria-label={`إنقاص ${dish.name}`}
+                            className="flex size-7 items-center justify-center rounded-full hover:bg-white/15 dark:hover:bg-primary/20 transition-colors"
+                          >
+                            <Minus className="size-3.5" />
+                          </motion.button>
+                        </div>
+                      </motion.li>
+                    ))}
+                  </ul>
+                </motion.div>
               )}
             </AnimatePresence>
 

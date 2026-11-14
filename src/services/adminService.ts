@@ -47,7 +47,7 @@ export const DEFAULT_DISCOUNTS: AdminDiscount[] = [
 // Fallback initial SEO settings
 export const DEFAULT_SEO_SETTINGS: SeoSettings = {
   siteTitle: 'هشوشة (Hashousha) — متجر البابكا الحرفية والمخبوزات الفاخرة بالرياض',
-  siteDescription: 'أشهى روائع البابكا الحرفية والمخبوزات الطازجة بحشوات النوتيلا والبيكان، البيستو والصنوبر، والأجبان والزعتر. تُخبز يومياً بعجين بريوش مخمر وتوصيل مجهز لكافة أحياء الرياض.',
+  siteDescription: 'أشهى روائع البابكا الحرفية والمخبوزات الطازجة بحشوات النوتيلا والبيكان، البيستو والصنوبر، والأجبان والزعتر. تُخبز يومياً بعجين بريوش مخمر وتوصيل سريع لكافة أحياء الرياض.',
   keywords: 'بابكا بالرياض, بابكا ميني, بابكا نوتيلا وبيكان, بوكسات بابكا, بابكا بيستو, مخبوزات فاخرة بالرياض, كوكيز هشوشة, هشوشة',
   ogImage: 'https://hshosha.com/images/brand-og.jpg',
   googleSiteVerification: '',
@@ -876,6 +876,26 @@ interface CloudSiteContentRow {
   updated_at?: string
 }
 
+export function sanitizeDeliveryPhrases(text: string): string {
+  if (!text) return text
+  return text
+    .replace(/توصيل مجهّز \(سيارات مبردة\)/g, 'توصيل سريع بالرياض')
+    .replace(/توصيل مجهز \(سيارات مبردة\)/g, 'توصيل سريع بالرياض')
+    .replace(/سيارات مبردة لحفظ حرارة وطراوة الأطباق/g, 'لحفظ الطراوة والجودة الطازجة')
+    .replace(/سيارات مبردة لحفظ طراوة الأطباق بالرياض/g, 'توصيل يومي طازج لكافة أحياء الرياض')
+    .replace(/سيارات مبردة/g, 'توصيل سريع')
+    .replace(/سيارة مبردة/g, 'توصيل سريع')
+    .replace(/بسيارات مجهزة ومبردة/g, 'يومياً وبكل سرعة')
+    .replace(/بسيارات مجهزة/g, 'لكافة أحياء الرياض')
+    .replace(/توصيل مجهّز ومبرد/g, 'توصيل سريع بالرياض')
+    .replace(/توصيل مجهز ومبرد/g, 'توصيل سريع بالرياض')
+    .replace(/توصيل مجهّز بالرياض/g, 'توصيل سريع بالرياض')
+    .replace(/توصيل مجهز بالرياض/g, 'توصيل سريع بالرياض')
+    .replace(/توصيل مجهّز/g, 'توصيل سريع')
+    .replace(/توصيل مجهز/g, 'توصيل سريع')
+    .replace(/أسطول النقل المجهز بالرياض/g, 'أسطول التوصيل السريع بالرياض')
+}
+
 export async function fetchSiteContent(): Promise<SiteContentSettings> {
   try {
     const { data, error } = await supabase
@@ -889,6 +909,33 @@ export async function fetchSiteContent(): Promise<SiteContentSettings> {
     }
 
     const row = data as CloudSiteContentRow
+    const rawPillars = Array.isArray(row.pillars) && row.pillars.length > 0 ? row.pillars : DEFAULT_SITE_CONTENT.pillars
+    const sanitizedPillars = rawPillars.map((p) => ({
+      title: sanitizeDeliveryPhrases(p.title),
+      subtitle: sanitizeDeliveryPhrases(p.subtitle),
+    }))
+
+    const mergedUiStrings = { ...DEFAULT_UI_STRINGS, ...(row.ui_strings || {}) }
+    const sanitizedUiStrings: Record<string, string> = {}
+    for (const [k, v] of Object.entries(mergedUiStrings)) {
+      sanitizedUiStrings[k] = sanitizeDeliveryPhrases(v)
+    }
+    if (
+      !sanitizedUiStrings['checkout.deliveryFeeTitle'] ||
+      sanitizedUiStrings['checkout.deliveryFeeTitle'].includes('مبردة') ||
+      sanitizedUiStrings['checkout.deliveryFeeTitle'].includes('مجهّز')
+    ) {
+      sanitizedUiStrings['checkout.deliveryFeeTitle'] = 'توصيل سريع بالرياض'
+    }
+    if (
+      !sanitizedUiStrings['dishModal.highlightDelivery'] ||
+      sanitizedUiStrings['dishModal.highlightDelivery'].includes('مجهزة') ||
+      sanitizedUiStrings['dishModal.highlightDelivery'].includes('مبردة') ||
+      sanitizedUiStrings['dishModal.highlightDelivery'] === 'توصيل فوري'
+    ) {
+      sanitizedUiStrings['dishModal.highlightDelivery'] = 'توصيل فوري لكافة أحياء الرياض'
+    }
+
     return {
       id: row.id,
       heroImage: row.hero_image || DEFAULT_SITE_CONTENT.heroImage,
@@ -900,10 +947,10 @@ export async function fetchSiteContent(): Promise<SiteContentSettings> {
       heroSubtitle: row.hero_subtitle || DEFAULT_SITE_CONTENT.heroSubtitle,
       heroDescription: row.hero_description || DEFAULT_SITE_CONTENT.heroDescription,
       heroAlt: row.hero_alt || DEFAULT_SITE_CONTENT.heroAlt,
-      pillars: Array.isArray(row.pillars) && row.pillars.length > 0 ? row.pillars : DEFAULT_SITE_CONTENT.pillars,
+      pillars: sanitizedPillars,
       footerTitle: row.footer_title || DEFAULT_SITE_CONTENT.footerTitle,
       footerSubtitle: row.footer_subtitle || DEFAULT_SITE_CONTENT.footerSubtitle,
-      deliveryNotice: row.delivery_notice || DEFAULT_SITE_CONTENT.deliveryNotice,
+      deliveryNotice: sanitizeDeliveryPhrases(row.delivery_notice || DEFAULT_SITE_CONTENT.deliveryNotice),
       bankName: row.bank_name || DEFAULT_SITE_CONTENT.bankName,
       bankAccountName: row.bank_account_name || DEFAULT_SITE_CONTENT.bankAccountName,
       bankIban: row.bank_iban || DEFAULT_SITE_CONTENT.bankIban,
@@ -919,7 +966,7 @@ export async function fetchSiteContent(): Promise<SiteContentSettings> {
         row.dark_mode_enabled !== undefined && row.dark_mode_enabled !== null
           ? Boolean(row.dark_mode_enabled)
           : (DEFAULT_SITE_CONTENT.darkModeEnabled ?? true),
-      uiStrings: { ...DEFAULT_UI_STRINGS, ...(row.ui_strings || {}) },
+      uiStrings: sanitizedUiStrings,
       themeColors: row.theme_colors || DEFAULT_SITE_CONTENT.themeColors || DEFAULT_THEME_COLORS,
       updatedAt: row.updated_at,
     }

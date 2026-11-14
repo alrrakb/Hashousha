@@ -25,6 +25,7 @@ import { validateCouponCode } from '../../services/adminService'
 import { AdminDiscount } from '../../types/admin'
 import { modalBackdropVariants, modalDialogVariants } from '../../lib/motion'
 import { cn } from '../../lib/utils'
+import { FreeDeliveryProgressBar } from '../storefront/v0/FreeDeliveryProgressBar'
 
 export interface CheckoutModalProps {
   isOpen: boolean
@@ -33,6 +34,7 @@ export interface CheckoutModalProps {
 }
 
 const DELIVERY_FEE = 20 // Fixed delivery fee for Riyadh districts (20 SAR)
+const FREE_DELIVERY_THRESHOLD = 150 // Free delivery threshold for Riyadh orders (150 SAR)
 
 export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const { lines, totalItems, totalPrice, clearCart } = useCart()
@@ -62,7 +64,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, o
     message: string
   } | null>(null)
 
-  const grandTotal = Math.max(0, totalPrice - discountAmount) + DELIVERY_FEE
+  const isFreeDelivery = totalPrice >= FREE_DELIVERY_THRESHOLD
+  const effectiveDeliveryFee = isFreeDelivery ? 0 : DELIVERY_FEE
+  const grandTotal = Math.max(0, totalPrice - discountAmount) + effectiveDeliveryFee
 
   const handleCustomerChange = (field: keyof CustomerDetails, value: string) => {
     setCustomer((prev) => ({ ...prev, [field]: value }))
@@ -186,7 +190,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, o
         totalPrice: l.unitPrice * l.quantity,
       })),
       subtotal: totalPrice,
-      deliveryFee: DELIVERY_FEE,
+      deliveryFee: effectiveDeliveryFee,
       totalAmount: grandTotal,
       paymentMethod,
       status: 'pending',
@@ -283,7 +287,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, o
         </div>
 
         {/* Scrollable Body Content */}
-        <div className="overflow-y-auto px-5 py-4 space-y-6 flex-1">
+        <div className="overflow-y-auto px-5 py-4 space-y-5 flex-1">
+          {/* Interactive Free Delivery Progress Bar */}
+          <FreeDeliveryProgressBar totalPrice={totalPrice} threshold={FREE_DELIVERY_THRESHOLD} />
+
           {/* Order Summary Capsule */}
           <section className="rounded-2xl border border-primary/20 bg-background/90 p-4 space-y-3" aria-label="ملخص السلة">
             <div className="flex items-center justify-between text-xs font-bold text-foreground border-b border-border/50 pb-2">
@@ -401,12 +408,21 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, o
                 </div>
               )}
 
-              <div className="flex justify-between text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <Truck className="size-3.5 text-primary" />
-                  <span>{t('checkout.deliveryFeeTitle', 'رسوم التوصيل السريع (الرياض)')}:</span>
+              <div className="flex justify-between items-center text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <Truck className={cn('size-3.5', isFreeDelivery ? 'text-emerald-600' : 'text-primary')} />
+                  <span>{t('checkout.deliveryFeeTitle', 'توصيل سريع بالرياض')}:</span>
                 </span>
-                <span>{formatPrice(DELIVERY_FEE)}</span>
+                {isFreeDelivery ? (
+                  <span className="flex items-center gap-1.5 font-bold text-emerald-700 dark:text-emerald-400">
+                    <span className="text-xs">مجاني 🎉</span>
+                    <span className="line-through text-[11px] text-muted-foreground/70 font-normal">
+                      (بدلاً من {formatPrice(DELIVERY_FEE)})
+                    </span>
+                  </span>
+                ) : (
+                  <span>{formatPrice(DELIVERY_FEE)}</span>
+                )}
               </div>
 
               <div className="flex justify-between text-sm font-black text-foreground pt-1 border-t border-border/40">

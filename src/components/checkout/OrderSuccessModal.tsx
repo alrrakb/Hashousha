@@ -68,7 +68,9 @@ export const OrderSuccessModal: React.FC<OrderSuccessModalProps> = ({ order, onC
     itemsText,
     `--------------------------`,
     `المجموع الفرعي: ${formatPrice(order.subtotal)}`,
-    `رسوم التوصيل: ${formatPrice(order.deliveryFee)}`,
+    order.deliveryFee === 0
+      ? `🚚 التوصيل: مجاني (عرض الجمعات فوق 150 ر.س)`
+      : `رسوم التوصيل: ${formatPrice(order.deliveryFee)}`,
     `*المجموع الكلي: ${formatPrice(order.totalAmount)}*`,
     `طريقة الدفع: ${paymentMethodLabel}`,
     `--------------------------`,
