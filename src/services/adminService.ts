@@ -571,6 +571,13 @@ export async function saveSeoSettings(settings: SeoSettings): Promise<{ success:
 // ---------------------------------------------------------------------------
 
 export const OFFICIAL_SITEMAP_URL = 'https://hshosha.com/sitemap.xml'
+export const OFFICIAL_ROBOTS_URL = 'https://hshosha.com/robots.txt'
+export const DEFAULT_ROBOTS_RULES = `User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/*
+
+Sitemap: https://hshosha.com/sitemap.xml`
 export const SITEMAP_STORAGE_KEY = 'hashousha_sitemap_last_synced'
 
 export async function getSitemapStats(): Promise<SitemapStats> {

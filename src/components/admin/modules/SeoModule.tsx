@@ -18,6 +18,8 @@ import {
   ShieldCheck,
   KeyRound,
   Trash2,
+  FileText,
+  Lock,
 } from 'lucide-react'
 import { SeoSettings, SitemapStats } from '../../../types/admin'
 import {
@@ -25,6 +27,8 @@ import {
   getSitemapStats,
   triggerSitemapRegeneration,
   OFFICIAL_SITEMAP_URL,
+  OFFICIAL_ROBOTS_URL,
+  DEFAULT_ROBOTS_RULES,
 } from '../../../services/adminService'
 import { cn } from '../../../lib/utils'
 
@@ -84,6 +88,10 @@ export const SeoModule: React.FC<SeoModuleProps> = ({
   const [gscSuccess, setGscSuccess] = useState<string | null>(null)
   const [gscError, setGscError] = useState<string | null>(null)
   const [copiedMetaTag, setCopiedMetaTag] = useState(false)
+
+  // Robots.txt Hub State
+  const [copiedRobotsContent, setCopiedRobotsContent] = useState(false)
+  const [copiedRobotsUrl, setCopiedRobotsUrl] = useState(false)
 
   // Sitemap Hub State
   const [sitemapStats, setSitemapStats] = useState<SitemapStats | null>(null)
@@ -168,6 +176,34 @@ export const SeoModule: React.FC<SeoModuleProps> = ({
 
   const handlePreviewSitemap = () => {
     window.open('/sitemap.xml', '_blank')
+  }
+
+  const handleCopyRobotsUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(OFFICIAL_ROBOTS_URL)
+      setCopiedRobotsUrl(true)
+      setTimeout(() => setCopiedRobotsUrl(false), 2500)
+    } catch {
+      // ignore
+    }
+  }
+
+  const handleCopyRobotsContent = async () => {
+    try {
+      await navigator.clipboard.writeText(DEFAULT_ROBOTS_RULES)
+      setCopiedRobotsContent(true)
+      setTimeout(() => setCopiedRobotsContent(false), 2500)
+    } catch {
+      // ignore
+    }
+  }
+
+  const handlePreviewRobots = () => {
+    window.open('/robots.txt', '_blank')
+  }
+
+  const handleOpenRobotsTester = () => {
+    window.open('https://www.google.com/webmasters/tools/robots-testing-tool', '_blank')
   }
 
   const handleOpenGSC = () => {
@@ -731,6 +767,191 @@ export const SeoModule: React.FC<SeoModuleProps> = ({
             <span className="font-bold text-foreground">💡 نصيحة السيو الفندقية: </span>
             <span>
               رابط خريطة الموقع مسجل مسبقاً في ملف <code className="font-mono text-primary font-bold">robots.txt</code>، وتقوم محركات البحث بقراءته آلياً. عند إضافة أطباق جديدة يمكنك النقر على «تقديم الرابط إلى Google Search Console» لطلب أرشفة عاجلة لصفحات الأطباق الجديدة دون انتظار دورة الزحف التلقائي.
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* ------------------------------------------------------------- */}
+      {/* 4. Robots.txt Shielding Hub (مركز إدارة ومراقبة توجيه الروبوتات) */}
+      {/* ------------------------------------------------------------- */}
+      <div className="rounded-2xl border border-primary/20 bg-card p-5 sm:p-6 shadow-sm space-y-6 text-right font-sans">
+        {/* Hub Header & Status Badge */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 pb-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="size-6 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                <FileText className="size-3.5" />
+              </span>
+              <h3 className="text-sm sm:text-base font-black text-foreground">
+                مركز توجيه وحماية الروبوتات (Robots.txt Shielding Hub)
+              </h3>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              مراقبة سياسات زحف محركات البحث، حظر المسارات الحساسة للوحة الإدارة لحماية خصوصية البيانات، وتوجيه عناكب Googlebot لصفحات الأطباق وخريطة الموقع.
+            </p>
+          </div>
+
+          {/* Live Status Badge */}
+          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-1.5 text-xs font-bold text-emerald-800 dark:text-emerald-300 self-start sm:self-center shrink-0 shadow-xs">
+            <span className="relative flex size-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full size-2.5 bg-emerald-600"></span>
+            </span>
+            <span>ملف robots.txt نشط ومحصن</span>
+          </div>
+        </div>
+
+        {/* 3 Core Rules Breakdown Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+          {/* Rule 1: Allow Storefront */}
+          <div className="rounded-xl border border-border/80 bg-background/60 p-4 space-y-1.5 shadow-xs">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-muted-foreground">سياسة السماح (Allow)</span>
+              <span className="size-5 rounded-md bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                <Globe className="size-3" />
+              </span>
+            </div>
+            <p className="text-sm font-black font-mono text-emerald-700 dark:text-emerald-400" dir="ltr">
+              Allow: /
+            </p>
+            <p className="text-[10px] text-muted-foreground leading-normal">
+              السماح الكامل لمحركات البحث بفهرسة الصفحة الرئيسية، صفحات الأطباق، والبوكسات.
+            </p>
+          </div>
+
+          {/* Rule 2: Disallow Admin */}
+          <div className="rounded-xl border border-border/80 bg-background/60 p-4 space-y-1.5 shadow-xs">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-muted-foreground">سياسة العزل (Disallow)</span>
+              <span className="size-5 rounded-md bg-amber-500/10 flex items-center justify-center text-amber-600">
+                <Lock className="size-3" />
+              </span>
+            </div>
+            <p className="text-sm font-black font-mono text-amber-700 dark:text-amber-400" dir="ltr">
+              Disallow: /admin/*
+            </p>
+            <p className="text-[10px] text-muted-foreground leading-normal">
+              حظر كامل للوحة الإدارة ومسارات المطبخ المركزي لمنع استكشافها وحماية الخصوصية.
+            </p>
+          </div>
+
+          {/* Rule 3: Sitemap Target */}
+          <div className="rounded-xl border border-border/80 bg-background/60 p-4 space-y-1.5 shadow-xs">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-muted-foreground">دليل الخريطة (Sitemap)</span>
+              <span className="size-5 rounded-md bg-primary/10 flex items-center justify-center text-primary">
+                <FileCode2 className="size-3" />
+              </span>
+            </div>
+            <p className="text-sm font-black font-mono text-primary truncate" dir="ltr">
+              hshosha.com/sitemap.xml
+            </p>
+            <p className="text-[10px] text-muted-foreground leading-normal">
+              إرشاد عناكب البحث آلياً لقراءة ملف السايت ماب الشامل لكافة الأطباق النشطة.
+            </p>
+          </div>
+        </div>
+
+        {/* Official URL Row with Quick Copy */}
+        <div className="rounded-xl border border-border/80 bg-background/80 p-3.5 space-y-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-foreground">
+                الرابط المباشر لملف robots.txt الحي على السيرفر:
+              </span>
+              <code className="text-xs font-mono font-bold text-primary select-all bg-primary/5 px-2 py-0.5 rounded-md" dir="ltr">
+                {OFFICIAL_ROBOTS_URL}
+              </code>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleCopyRobotsUrl}
+              className="flex items-center gap-1 rounded-lg bg-primary/10 border border-primary/20 px-2.5 py-1.5 text-xs font-bold text-primary hover:bg-primary hover:text-white transition-all shrink-0 cursor-pointer self-start sm:self-auto"
+              title="نسخ الرابط المباشر"
+            >
+              {copiedRobotsUrl ? (
+                <>
+                  <Check className="size-3.5 text-emerald-600" />
+                  <span className="text-[10px] text-emerald-600">تم نسخ الرابط!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="size-3.5" />
+                  <span className="text-[10px]">نسخ الرابط</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Live File Code Viewer with Terminal Theme */}
+        <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-4 space-y-2.5 shadow-sm text-left font-mono" dir="ltr">
+          <div className="flex items-center justify-between border-b border-neutral-800 pb-2">
+            <div className="flex items-center gap-2 text-xs text-neutral-400">
+              <div className="flex items-center gap-1.5">
+                <span className="size-2.5 rounded-full bg-rose-500/80"></span>
+                <span className="size-2.5 rounded-full bg-amber-500/80"></span>
+                <span className="size-2.5 rounded-full bg-emerald-500/80"></span>
+              </div>
+              <span className="text-[11px] text-neutral-400 font-sans font-medium">
+                public/robots.txt (Directives Preview)
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleCopyRobotsContent}
+              className="flex items-center gap-1 text-[11px] text-neutral-400 hover:text-neutral-200 transition-colors font-sans cursor-pointer bg-neutral-900 border border-neutral-800 px-2 py-1 rounded-md"
+            >
+              {copiedRobotsContent ? (
+                <>
+                  <Check className="size-3 text-emerald-400" />
+                  <span className="text-emerald-400 text-[10px]">تم نسخ الأوامر!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="size-3 text-neutral-400" />
+                  <span className="text-[10px]">نسخ محتوى الملف</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          <pre className="text-xs text-emerald-400/90 leading-relaxed overflow-x-auto whitespace-pre font-mono py-1">
+            {DEFAULT_ROBOTS_RULES}
+          </pre>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-2 border-t border-border/60">
+          <button
+            type="button"
+            onClick={handlePreviewRobots}
+            className="flex items-center justify-center gap-1.5 rounded-xl border border-border bg-background px-4 py-2.5 text-xs font-bold text-foreground hover:bg-secondary transition-all shadow-xs cursor-pointer"
+          >
+            <ExternalLink className="size-3.5 text-muted-foreground" />
+            <span>معاينة ملف robots.txt الحي ↗️</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleOpenRobotsTester}
+            className="flex items-center justify-center gap-1.5 rounded-xl border border-primary/30 bg-primary/5 px-4 py-2.5 text-xs font-bold text-primary hover:bg-primary/10 transition-all shadow-xs cursor-pointer"
+          >
+            <ShieldCheck className="size-3.5" />
+            <span>فحص صلاحية القواعد في أداة Google Robots 🔍</span>
+          </button>
+        </div>
+
+        {/* Pro Tip Callout */}
+        <div className="rounded-xl bg-secondary/40 border border-primary/10 p-3 flex items-start gap-2.5 text-[11px] text-muted-foreground leading-relaxed">
+          <Sparkles className="size-4 text-primary shrink-0 mt-0.5" />
+          <div>
+            <span className="font-bold text-foreground">💡 حوكمة الأرشفة: </span>
+            <span>
+              ملف <code className="font-mono text-primary font-bold">robots.txt</code> هو خط الدفاع الأول لمنع محركات البحث من إهدار ميزانية الزحف (Crawl Budget) على صفحات الإدارة والمطبخ الحساسة، ويعمل بتناغم تام مع <code className="font-mono text-primary font-bold">sitemap.xml</code> لضمان توجيه خوارزميات جوجل بنسبة 100% نحو أطباق ومنتجات هشوشة الجاهزة للطلب.
             </span>
           </div>
         </div>
