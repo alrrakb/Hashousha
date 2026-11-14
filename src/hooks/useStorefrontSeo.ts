@@ -1,6 +1,13 @@
 import { useEffect, useState, useCallback } from 'react'
 import { SeoSettings } from '../types/admin'
 import { fetchSeoSettings, DEFAULT_SEO_SETTINGS } from '../services/adminService'
+import {
+  injectJsonLd,
+  getBakerySchema,
+  getFaqPageSchema,
+  getBreadcrumbSchema,
+  getDefaultStorefrontBreadcrumbs,
+} from '../utils/seoSchemas'
 
 export function useStorefrontSeo(currentPath: string = '/') {
   const [seo, setSeo] = useState<SeoSettings>(DEFAULT_SEO_SETTINGS)
@@ -9,7 +16,21 @@ export function useStorefrontSeo(currentPath: string = '/') {
   const applySeoToHead = useCallback((settings: SeoSettings) => {
     if (typeof window === 'undefined') return
 
-    // Do not overwrite metadata on specific dish landing pages (/dish/:slug)
+    // 0. Google Site Verification Meta Tag (Global ownership verification)
+    let gscMeta = document.querySelector('meta[name="google-site-verification"]')
+    const verificationCode = settings.googleSiteVerification?.trim()
+    if (verificationCode) {
+      if (!gscMeta) {
+        gscMeta = document.createElement('meta')
+        gscMeta.setAttribute('name', 'google-site-verification')
+        document.head.appendChild(gscMeta)
+      }
+      gscMeta.setAttribute('content', verificationCode)
+    } else if (gscMeta) {
+      gscMeta.remove()
+    }
+
+    // Do not overwrite title/description on specific dish landing pages (/dish/:slug)
     const isDishRoute = window.location.pathname.startsWith('/dish/')
     if (isDishRoute) return
 
@@ -62,9 +83,28 @@ export function useStorefrontSeo(currentPath: string = '/') {
     }
 
     if (settings.ogImage) {
-      updateOrCreateMeta('property', 'og:image', settings.ogImage)
-      updateOrCreateMeta('name', 'twitter:image', settings.ogImage)
+      const fullOgImage = settings.ogImage.startsWith('http')
+        ? settings.ogImage
+        : `https://hshosha.com${settings.ogImage.startsWith('/') ? '' : '/'}${settings.ogImage}`
+      updateOrCreateMeta('property', 'og:image', fullOgImage)
+      updateOrCreateMeta('property', 'og:image:secure_url', fullOgImage)
+      updateOrCreateMeta('name', 'twitter:image', fullOgImage)
     }
+    updateOrCreateMeta('property', 'og:url', 'https://hshosha.com/')
+
+    // 5. Canonical URL - Hardened against URL parameters and fragments
+    let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null
+    if (!canonicalLink) {
+      canonicalLink = document.createElement('link')
+      canonicalLink.setAttribute('rel', 'canonical')
+      document.head.appendChild(canonicalLink)
+    }
+    canonicalLink.setAttribute('href', 'https://hshosha.com/')
+
+    // 6. Inject Rich Structured Data (Bakery, FAQPage & Breadcrumbs)
+    injectJsonLd('storefront-bakery-schema', getBakerySchema())
+    injectJsonLd('storefront-faq-schema', getFaqPageSchema())
+    injectJsonLd('storefront-breadcrumb-schema', getBreadcrumbSchema(getDefaultStorefrontBreadcrumbs()))
   }, [])
 
   const loadSettings = useCallback(async () => {

@@ -67,6 +67,15 @@ export interface SeoSettings {
   siteDescription: string
   keywords: string
   ogImage: string
+  googleSiteVerification?: string
+}
+
+export interface SitemapStats {
+  sitemapUrl: string
+  totalPages: number
+  activeDishesCount: number
+  isGoogleCompliant: boolean
+  lastModified: string
 }
 
 export interface BrandPillarItem {

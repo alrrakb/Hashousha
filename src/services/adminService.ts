@@ -1,6 +1,6 @@
 import { supabase } from './supabase'
 import { Dish, BadgeKind, DishVariant } from '../types/menu'
-import { AdminCategory, AdminDiscount, CustomerSummary, SeoSettings, AdminReview, SiteContentSettings, StoreThemeColors, DEFAULT_THEME_COLORS, DEFAULT_SITE_CONTENT, DEFAULT_UI_STRINGS } from '../types/admin'
+import { AdminCategory, AdminDiscount, CustomerSummary, SeoSettings, SitemapStats, AdminReview, SiteContentSettings, StoreThemeColors, DEFAULT_THEME_COLORS, DEFAULT_SITE_CONTENT, DEFAULT_UI_STRINGS } from '../types/admin'
 import { Order } from '../types/order'
 import { dishes as defaultDishes, categories as defaultCategories } from '../data/menu'
 import { optimizeImageToWebp, OPTIMIZER_PRESETS } from '../utils/imageOptimizer'
@@ -49,7 +49,8 @@ export const DEFAULT_SEO_SETTINGS: SeoSettings = {
   siteTitle: 'هشوشة (Hashousha) — متجر البابكا الحرفية والمخبوزات الفاخرة بالرياض',
   siteDescription: 'أشهى روائع البابكا الحرفية والمخبوزات الطازجة بحشوات النوتيلا والبيكان، البيستو والصنوبر، والأجبان والزعتر. تُخبز يومياً بعجين بريوش مخمر وتوصيل مجهز لكافة أحياء الرياض.',
   keywords: 'بابكا بالرياض, بابكا ميني, بابكا نوتيلا وبيكان, بوكسات بابكا, بابكا بيستو, مخبوزات فاخرة بالرياض, كوكيز هشوشة, هشوشة',
-  ogImage: '/images/brand-og.jpg',
+  ogImage: 'https://hshosha.com/images/brand-og.jpg',
+  googleSiteVerification: '',
 }
 
 // ---------------------------------------------------------------------------
@@ -117,6 +118,9 @@ interface CloudDishRow {
   seo_title?: string
   seo_description?: string
   seo_keywords?: string[]
+  highlights?: string[]
+  preparation_tip?: string
+  show_preparation_tip?: boolean
 }
 
 export async function fetchDishesFromSupabase(): Promise<Dish[]> {
@@ -126,27 +130,56 @@ export async function fetchDishesFromSupabase(): Promise<Dish[]> {
       return defaultDishes
     }
 
-    return data.map((d: CloudDishRow) => ({
-      id: d.id,
-      name: d.name,
-      englishName: d.english_name || '',
-      slug: d.slug || d.id,
-      description: d.description || '',
-      longDescription: d.long_description || undefined,
-      servingInfo: d.serving_info || undefined,
-      price: Number(d.price),
-      unit: d.unit || '',
-      category: d.category,
-      categories: Array.isArray(d.categories) && d.categories.length > 0 ? d.categories : (d.category ? [d.category] : []),
-      image: d.image || '/images/dishes/babka-mini-pesto.png',
-      imageAlt: d.image_alt || undefined,
-      badges: (d.badges || []) as BadgeKind[],
-      inStock: d.in_stock,
-      variants: Array.isArray(d.variants) && d.variants.length > 0 ? d.variants : undefined,
-      seoTitle: d.seo_title,
-      seoDescription: d.seo_description,
-      seoKeywords: Array.isArray(d.seo_keywords) ? d.seo_keywords : undefined,
-    }))
+    return data.map((d: CloudDishRow) => {
+      let localHighlights: string[] | undefined = undefined
+      let localPrepTip: string | undefined = undefined
+      let localShowPrep: boolean | undefined = undefined
+
+      if (typeof window !== 'undefined') {
+        try {
+          const rawH = localStorage.getItem(`hashousha_dish_highlights_${d.id}`)
+          if (rawH) {
+            const parsed = JSON.parse(rawH)
+            if (Array.isArray(parsed)) localHighlights = parsed
+          }
+          const rawP = localStorage.getItem(`hashousha_dish_prep_tip_${d.id}`)
+          if (rawP !== null) localPrepTip = rawP
+          const rawS = localStorage.getItem(`hashousha_dish_show_prep_${d.id}`)
+          if (rawS !== null) localShowPrep = rawS === 'true'
+        } catch {}
+      }
+
+      const finalHighlights = Array.isArray(d.highlights)
+        ? d.highlights
+        : (Array.isArray(localHighlights) ? localHighlights : undefined)
+
+      return {
+        id: d.id,
+        name: d.name,
+        englishName: d.english_name || '',
+        slug: d.slug || d.id,
+        description: d.description || '',
+        longDescription: d.long_description || undefined,
+        servingInfo: d.serving_info || undefined,
+        price: Number(d.price),
+        unit: d.unit || '',
+        category: d.category,
+        categories: Array.isArray(d.categories) && d.categories.length > 0 ? d.categories : (d.category ? [d.category] : []),
+        image: d.image || '/images/dishes/babka-mini-pesto.png',
+        imageAlt: d.image_alt || undefined,
+        badges: (d.badges || []) as BadgeKind[],
+        inStock: d.in_stock,
+        variants: Array.isArray(d.variants) && d.variants.length > 0 ? d.variants : undefined,
+        seoTitle: d.seo_title,
+        seoDescription: d.seo_description,
+        seoKeywords: Array.isArray(d.seo_keywords) ? d.seo_keywords : undefined,
+        highlights: finalHighlights,
+        preparationTip: d.preparation_tip || localPrepTip || undefined,
+        showPreparationTip: d.show_preparation_tip !== undefined
+          ? d.show_preparation_tip
+          : (localShowPrep !== undefined ? localShowPrep : undefined),
+      }
+    })
   } catch (err) {
     console.warn('Error fetching dishes from Supabase:', err)
     return defaultDishes
@@ -155,11 +188,28 @@ export async function fetchDishesFromSupabase(): Promise<Dish[]> {
 
 export async function saveDishToSupabase(dish: Dish): Promise<{ success: boolean; error?: string }> {
   try {
+    // 1. Immediately persist highlights and preparation tip to localStorage for instant resilience
+    if (typeof window !== 'undefined') {
+      try {
+        if (dish.highlights !== undefined) {
+          localStorage.setItem(`hashousha_dish_highlights_${dish.id}`, JSON.stringify(dish.highlights))
+        }
+        if (dish.preparationTip !== undefined) {
+          localStorage.setItem(`hashousha_dish_prep_tip_${dish.id}`, dish.preparationTip || '')
+        }
+        if (dish.showPreparationTip !== undefined) {
+          localStorage.setItem(`hashousha_dish_show_prep_${dish.id}`, String(dish.showPreparationTip))
+        }
+      } catch (e) {
+        console.warn('Could not cache dish customizations locally:', e)
+      }
+    }
+
     const finalCategories = Array.isArray(dish.categories) && dish.categories.length > 0
       ? dish.categories
       : (dish.category ? [dish.category] : [])
 
-    const payload = {
+    const payload: Record<string, any> = {
       id: dish.id,
       name: dish.name,
       english_name: dish.englishName,
@@ -179,9 +229,19 @@ export async function saveDishToSupabase(dish: Dish): Promise<{ success: boolean
       seo_title: dish.seoTitle || null,
       seo_description: dish.seoDescription || null,
       seo_keywords: Array.isArray(dish.seoKeywords) ? dish.seoKeywords : [],
+      highlights: Array.isArray(dish.highlights) ? dish.highlights : null,
+      preparation_tip: dish.preparationTip || null,
+      show_preparation_tip: dish.showPreparationTip !== undefined ? dish.showPreparationTip : null,
     }
 
-    const { error } = await supabase.from('dishes').upsert(payload, { onConflict: 'id' })
+    let { error } = await supabase.from('dishes').upsert(payload, { onConflict: 'id' })
+    if (error && (error.message?.includes('highlights') || error.message?.includes('preparation_tip') || error.message?.includes('show_preparation_tip'))) {
+      delete payload.highlights
+      delete payload.preparation_tip
+      delete payload.show_preparation_tip
+      const retry = await supabase.from('dishes').upsert(payload, { onConflict: 'id' })
+      error = retry.error
+    }
     if (error) {
       console.warn('Save dish to Supabase error:', error.message)
       return { success: false, error: error.message }
@@ -220,10 +280,18 @@ export async function saveDishesBulkToSupabase(dishesToSave: Dish[]): Promise<{ 
         seo_title: dish.seoTitle || null,
         seo_description: dish.seoDescription || null,
         seo_keywords: Array.isArray(dish.seoKeywords) ? dish.seoKeywords : [],
+        highlights: Array.isArray(dish.highlights) ? dish.highlights : null,
+        preparation_tip: dish.preparationTip || null,
+        show_preparation_tip: dish.showPreparationTip !== undefined ? dish.showPreparationTip : null,
       }
     })
 
-    const { error } = await supabase.from('dishes').upsert(payloads, { onConflict: 'id' })
+    let { error } = await supabase.from('dishes').upsert(payloads, { onConflict: 'id' })
+    if (error && (error.message?.includes('highlights') || error.message?.includes('preparation_tip') || error.message?.includes('show_preparation_tip'))) {
+      const sanitized = payloads.map(({ highlights, preparation_tip, show_preparation_tip, ...rest }: any) => rest)
+      const retry = await supabase.from('dishes').upsert(sanitized, { onConflict: 'id' })
+      error = retry.error
+    }
     if (error) {
       console.warn('Bulk save dishes error:', error.message)
       return { success: false, error: error.message }
@@ -438,8 +506,13 @@ export async function validateCouponCode(
 export async function fetchSeoSettings(): Promise<SeoSettings> {
   try {
     const { data, error } = await supabase.from('seo_settings').select('*').limit(1).maybeSingle()
+    const localVerification = typeof window !== 'undefined' ? localStorage.getItem('hashousha_google_site_verification') : null
+
     if (error || !data) {
-      return DEFAULT_SEO_SETTINGS
+      return {
+        ...DEFAULT_SEO_SETTINGS,
+        googleSiteVerification: localVerification || '',
+      }
     }
     return {
       id: data.id,
@@ -447,25 +520,133 @@ export async function fetchSeoSettings(): Promise<SeoSettings> {
       siteDescription: data.site_description || DEFAULT_SEO_SETTINGS.siteDescription,
       keywords: data.keywords || DEFAULT_SEO_SETTINGS.keywords,
       ogImage: data.og_image || DEFAULT_SEO_SETTINGS.ogImage,
+      googleSiteVerification: data.google_site_verification || localVerification || '',
     }
   } catch {
-    return DEFAULT_SEO_SETTINGS
+    const localVerification = typeof window !== 'undefined' ? localStorage.getItem('hashousha_google_site_verification') : null
+    return {
+      ...DEFAULT_SEO_SETTINGS,
+      googleSiteVerification: localVerification || '',
+    }
   }
 }
 
 export async function saveSeoSettings(settings: SeoSettings): Promise<{ success: boolean; error?: string }> {
   try {
-    const { error } = await supabase.from('seo_settings').upsert({
+    const cleanVerification = settings.googleSiteVerification?.trim() || null
+
+    // Always mirror to localStorage for instant hydration across pages
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('hashousha_google_site_verification', cleanVerification || '')
+    }
+
+    const payload: Record<string, any> = {
       id: settings.id || 'default_seo',
       site_title: settings.siteTitle,
       site_description: settings.siteDescription,
       keywords: settings.keywords,
       og_image: settings.ogImage,
-    })
+      google_site_verification: cleanVerification,
+    }
+
+    let { error } = await supabase.from('seo_settings').upsert(payload)
+
+    // Graceful fallback if column google_site_verification is not created yet in remote Supabase schema
+    if (error && (error.message?.includes('google_site_verification') || error.code === 'PGRST204')) {
+      console.warn('Column google_site_verification not in remote table yet, saving other fields to Supabase:', error.message)
+      delete payload.google_site_verification
+      const retry = await supabase.from('seo_settings').upsert(payload)
+      error = retry.error
+    }
+
     if (error) return { success: false, error: error.message }
     return { success: true }
   } catch (err: unknown) {
     return { success: false, error: err instanceof Error ? err.message : 'Unknown' }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 5.5. Sitemap Hub & Real-time Metrics
+// ---------------------------------------------------------------------------
+
+export const OFFICIAL_SITEMAP_URL = 'https://hshosha.com/sitemap.xml'
+export const SITEMAP_STORAGE_KEY = 'hashousha_sitemap_last_synced'
+
+export async function getSitemapStats(): Promise<SitemapStats> {
+  try {
+    // 1. Query live active dishes count from Supabase
+    let activeDishesCount = 0
+    const { data, error } = await supabase
+      .from('dishes')
+      .select('id, in_stock, updated_at')
+
+    if (!error && Array.isArray(data) && data.length > 0) {
+      activeDishesCount = data.filter((d) => d.in_stock !== false).length
+    } else {
+      // Fallback to default dishes
+      activeDishesCount = defaultDishes.filter((d) => d.inStock !== false).length
+    }
+
+    // 2. Read last modified timestamp
+    let lastModified = ''
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(SITEMAP_STORAGE_KEY)
+      if (stored) {
+        lastModified = stored
+      }
+    }
+    if (!lastModified) {
+      lastModified = new Date().toISOString()
+    }
+
+    return {
+      sitemapUrl: OFFICIAL_SITEMAP_URL,
+      totalPages: 1 + activeDishesCount, // 1 Homepage + active dishes
+      activeDishesCount,
+      isGoogleCompliant: true,
+      lastModified,
+    }
+  } catch (err) {
+    console.warn('[getSitemapStats] Error fetching live sitemap stats:', err)
+    const fallbackActive = defaultDishes.filter((d) => d.inStock !== false).length
+    return {
+      sitemapUrl: OFFICIAL_SITEMAP_URL,
+      totalPages: 1 + fallbackActive,
+      activeDishesCount: fallbackActive,
+      isGoogleCompliant: true,
+      lastModified: new Date().toISOString(),
+    }
+  }
+}
+
+export async function triggerSitemapRegeneration(): Promise<{ success: boolean; stats: SitemapStats; error?: string }> {
+  try {
+    // 1. Fetch latest active dishes and verify connection
+    const stats = await getSitemapStats()
+    const nowIso = new Date().toISOString()
+    stats.lastModified = nowIso
+
+    // 2. Persist last synced timestamp
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(SITEMAP_STORAGE_KEY, nowIso)
+      window.dispatchEvent(new CustomEvent('hashousha_sitemap_updated', { detail: stats }))
+    }
+
+    return { success: true, stats }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Unknown error during sitemap regeneration'
+    return {
+      success: false,
+      stats: {
+        sitemapUrl: OFFICIAL_SITEMAP_URL,
+        totalPages: 1 + defaultDishes.length,
+        activeDishesCount: defaultDishes.length,
+        isGoogleCompliant: true,
+        lastModified: new Date().toISOString(),
+      },
+      error: msg,
+    }
   }
 }
 

@@ -18,6 +18,7 @@ import { AdminCategory, AdminBadge } from '../../../types/admin'
 import { uploadDishImage } from '../../../services/adminService'
 import { optimizeImageToWebp, OPTIMIZER_PRESETS, formatFileSize } from '../../../utils/imageOptimizer'
 import { getBadges, getBadgeIcon, BADGE_CHANNEL_NAME } from '../../../services/badgeService'
+import { useSiteContent } from '../../../context/SiteContentContext'
 import { cn } from '../../../lib/utils'
 
 export interface ProductEditModalProps {
@@ -52,6 +53,63 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
   const [seoDescription, setSeoDescription] = useState(dish?.seoDescription || '')
   const [seoKeywords, setSeoKeywords] = useState<string[]>(dish?.seoKeywords || [])
   const [keywordInput, setKeywordInput] = useState('')
+
+  const { t } = useSiteContent()
+
+  // Preparation & Serving Tip (طريقة التحضير والتقديم المقترحة)
+  const [showPreparationTip, setShowPreparationTip] = useState<boolean>(
+    dish?.showPreparationTip !== undefined ? dish.showPreparationTip : true
+  )
+  const [preparationTip, setPreparationTip] = useState<string>(
+    dish?.preparationTip || ''
+  )
+
+  // 4 Culinary Highlights Checkbox State
+  const [highlights, setHighlights] = useState<string[]>(() => {
+    if (Array.isArray(dish?.highlights)) {
+      return dish.highlights
+    }
+    if (dish?.id && typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem(`hashousha_dish_highlights_${dish.id}`)
+        if (cached) {
+          const parsed = JSON.parse(cached)
+          if (Array.isArray(parsed)) return parsed
+        }
+      } catch {}
+    }
+    // Default for new dish or dishes without explicit highlights array: all 4 checked
+    return ['fresh', 'ingredients', 'packaging', 'delivery']
+  })
+
+  const handleToggleHighlight = (key: string) => {
+    setHighlights((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    )
+  }
+
+  const highlightOptions = [
+    {
+      key: 'fresh',
+      label: t('dishModal.highlightFresh', 'تحضير طازج يومياً بالرياض'),
+      hint: 'يؤكد للعميل أن المخبوزات والطبق يُحضّر طازجاً في نفس يوم الطلب',
+    },
+    {
+      key: 'ingredients',
+      label: t('dishModal.highlightIngredients', 'زيت زيتون بكر ودبس رمان أصلي'),
+      hint: 'أبرز مكونات التحضير الفاخرة للطبق (مناسب للأصناف المالحة والتقليدية)',
+    },
+    {
+      key: 'packaging',
+      label: t('dishModal.highlightPackaging', 'تغليف حراري مخصص للجمعات'),
+      hint: 'يظهر ميزة الصواني والبوكسات الحرارية الحافظة للحرارة والطراوة',
+    },
+    {
+      key: 'delivery',
+      label: t('dishModal.highlightDelivery', 'توصيل فوري بسيارات مجهزة'),
+      hint: 'ضمان وصول الطلب بحالته المثالية عبر أسطول النقل المجهز بالرياض',
+    },
+  ]
 
   const handleAddKeyword = () => {
     const trimmed = keywordInput.trim().replace(/^#/, '')
@@ -211,6 +269,9 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
       seoDescription: seoDescription.trim() || undefined,
       seoKeywords: seoKeywords.length > 0 ? seoKeywords : undefined,
       variants: hasVariants && variants.length > 0 ? variants : undefined,
+      highlights,
+      showPreparationTip,
+      preparationTip: preparationTip.trim() || undefined,
     }
 
     try {
@@ -519,6 +580,127 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
               onChange={(e) => setLongDescription(e.target.value)}
               className="w-full rounded-xl border border-border bg-background p-3 text-xs leading-relaxed focus:border-primary focus:outline-none"
             />
+          </div>
+
+          {/* Row 3.8: Culinary Highlights Checkboxes (مزايا وركائز الجودة الأربع للطبق) */}
+          <div className="rounded-2xl border border-primary/20 bg-secondary/20 p-4 space-y-3 text-right">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-foreground flex items-center gap-2">
+                <span className="flex size-6 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <Sparkles className="size-3.5" />
+                </span>
+                <span>مزايا وركائز الجودة للطبق (Culinary Highlights)</span>
+              </label>
+              <span className="text-[10px] text-muted-foreground font-semibold">
+                {highlights.length} من 4 محددة
+              </span>
+            </div>
+
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              اختر المزايا التي تنطبق على هذا الصنف لعرضها في نافذة تفاصيل الطبق للمستهلك. الميزة المحددة ستظهر بداخل بطاقة الطبق، وغير المحددة ستُخفى تلقائياً:
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+              {highlightOptions.map((opt) => {
+                const isChecked = highlights.includes(opt.key)
+                return (
+                  <label
+                    key={opt.key}
+                    className={cn(
+                      'flex items-start gap-3 p-3 rounded-xl border text-xs cursor-pointer transition-all select-none',
+                      isChecked
+                        ? 'border-primary bg-primary/10 text-primary ring-1 ring-primary/30 shadow-xs'
+                        : 'border-border/80 bg-background/80 text-foreground/80 hover:bg-secondary'
+                    )}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={() => handleToggleHighlight(opt.key)}
+                      className="mt-0.5 size-4 rounded border-primary/30 text-primary focus:ring-primary/40 cursor-pointer"
+                    />
+                    <div className="flex-1 space-y-0.5">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-xs">{opt.label}</span>
+                        {isChecked && <Check className="size-3.5 text-primary shrink-0" />}
+                      </div>
+                      <p className="text-[10px] text-muted-foreground font-normal leading-tight">
+                        {opt.hint}
+                      </p>
+                    </div>
+                  </label>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Row 3.9: Preparation & Serving Tip (طريقة التحضير والتقديم الخاصة بالطبق) */}
+          <div className="rounded-2xl border border-primary/20 bg-secondary/20 p-4 space-y-3.5 text-right">
+            <div className="flex items-center justify-between gap-3">
+              <label className="text-xs font-bold text-foreground flex items-center gap-2">
+                <span className="flex size-6 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <UtensilsCrossed className="size-3.5" />
+                </span>
+                <span>طريقة التقديم والتحضير (Preparation & Serving Tip)</span>
+              </label>
+
+              {/* Master Switch for this Dish */}
+              <div className="flex items-center gap-2.5">
+                <span className={cn('text-[11px] font-bold transition-colors', showPreparationTip ? 'text-primary' : 'text-muted-foreground')}>
+                  {showPreparationTip ? 'مفعل للطبق' : 'معطل ومخفي'}
+                </span>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={showPreparationTip}
+                  onClick={() => setShowPreparationTip((prev) => !prev)}
+                  className={cn(
+                    'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+                    showPreparationTip ? 'bg-primary' : 'bg-muted-foreground/30'
+                  )}
+                  title={showPreparationTip ? 'إخفاء جزئية طريقة التحضير لهذا الطبق' : 'تفعيل وإظهار جزئية طريقة التحضير'}
+                >
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      'pointer-events-none inline-block size-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out',
+                      showPreparationTip ? '-translate-x-5' : 'translate-x-0'
+                    )}
+                  />
+                </button>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              تحكم في ظهور أو إخفاء إرشاد التقديم والتحضير لهذا الطبق. يمكنك كتابة إرشادات خاصة بالطبق أدناه، أو ترك الحقل فارغاً لاستخدام النص الافتراضي العام.
+            </p>
+
+            {showPreparationTip && (
+              <div className="space-y-2 pt-1 animate-in fade-in-50 duration-200">
+                <div className="flex items-center justify-between">
+                  <label htmlFor="dish-preparation-tip" className="text-[11px] font-bold text-foreground">
+                    نص طريقة التحضير والتقديم المقترحة:
+                  </label>
+                  <span className="text-[10px] text-muted-foreground">
+                    {preparationTip.length} حرف
+                  </span>
+                </div>
+                <textarea
+                  id="dish-preparation-tip"
+                  rows={3}
+                  value={preparationTip}
+                  onChange={(e) => setPreparationTip(e.target.value)}
+                  placeholder={t('dishModal.servingTipText', 'يُفضل التقديم بدرجة حرارة الغرفة (أو دافئاً قليلاً)، مع سكب صوص دبس الرمان الفاخر وتزيينه بحبات الرمان الطازجة وشرائح الليمون.')}
+                  className="w-full rounded-xl border border-border bg-background p-3 text-xs leading-relaxed focus:border-primary focus:outline-none"
+                />
+                <div className="rounded-xl bg-background/60 border border-primary/10 p-2.5 flex items-start gap-2 text-[10.5px] text-muted-foreground leading-relaxed">
+                  <span className="text-primary font-bold shrink-0">💡 ملاحظة:</span>
+                  <span>
+                    عنوان هذه الجزئية يتم التحكم به وتعديله من صفحة <span className="font-bold text-foreground">"المظهر والمحتوى"</span> ولا يتم تغييره من هنا لضمان اتساق هوية البراند.
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Row 4: Image Upload to Supabase Storage with WebP Optimizer */}

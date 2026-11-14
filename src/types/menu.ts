@@ -43,7 +43,19 @@ export interface Dish {
   seoTitle?: string
   seoDescription?: string
   seoKeywords?: string[]
+  highlights?: string[]
+  preparationTip?: string
+  showPreparationTip?: boolean
 }
+
+export const DISH_HIGHLIGHT_KEYS = [
+  'fresh',
+  'ingredients',
+  'packaging',
+  'delivery',
+] as const
+
+export type DishHighlightKey = (typeof DISH_HIGHLIGHT_KEYS)[number]
 
 export interface CartLine {
   dish: Dish

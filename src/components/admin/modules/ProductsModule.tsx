@@ -16,6 +16,7 @@ import { formatPrice } from '../../../data/menu'
 import { ProductEditModal } from './ProductEditModal'
 import { saveDishToSupabase, deleteDishFromSupabase } from '../../../services/adminService'
 import { getBadges, BADGE_CHANNEL_NAME, getBadgeDisplayConfig } from '../../../services/badgeService'
+import { useMenuStore } from '../../../store/useMenuStore'
 import { cn } from '../../../lib/utils'
 
 export interface ProductsModuleProps {
@@ -92,6 +93,7 @@ export const ProductsModule: React.FC<ProductsModuleProps> = ({
       nextDishes = [savedDish, ...dishes]
     }
     onUpdateDishes(nextDishes)
+    useMenuStore.getState().setDishes(nextDishes)
 
     // 2. Cloud save to Supabase
     await saveDishToSupabase(savedDish)
@@ -100,6 +102,7 @@ export const ProductsModule: React.FC<ProductsModuleProps> = ({
   const handleDeleteDish = async (dishId: string) => {
     const nextDishes = dishes.filter((d) => d.id !== dishId)
     onUpdateDishes(nextDishes)
+    useMenuStore.getState().setDishes(nextDishes)
     setDeletingDishId(null)
     await deleteDishFromSupabase(dishId)
   }
@@ -108,6 +111,7 @@ export const ProductsModule: React.FC<ProductsModuleProps> = ({
     const toggled = { ...dish, inStock: !dish.inStock }
     const nextDishes = dishes.map((d) => (d.id === dish.id ? toggled : d))
     onUpdateDishes(nextDishes)
+    useMenuStore.getState().setDishes(nextDishes)
     await saveDishToSupabase(toggled)
   }
 

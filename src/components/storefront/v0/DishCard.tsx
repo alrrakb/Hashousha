@@ -7,6 +7,7 @@ import { Dish } from '../../../types/menu'
 import { getBadgeDisplayConfig } from '../../../services/badgeService'
 import { useSiteContent } from '../../../context/SiteContentContext'
 import { cn } from '../../../lib/utils'
+import { getOptimizedDishImageAlt } from '../../../utils/imageSeo'
 
 export interface DishCardProps {
   dish: Dish
@@ -47,7 +48,7 @@ export function DishCard({ dish, onSelectDish }: DishCardProps) {
         )}
         <img
           src={dish.image || "/images/warak-enab.png"}
-          alt={dish.imageAlt || dish.name}
+          alt={getOptimizedDishImageAlt(dish)}
           loading="lazy"
           decoding="async"
           onLoad={() => setImgLoaded(true)}

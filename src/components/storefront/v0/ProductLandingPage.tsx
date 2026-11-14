@@ -29,6 +29,21 @@ import { ThemeToggle } from '../../common/ThemeToggle'
 import { getBadgeDisplayConfig } from '../../../services/badgeService'
 import { useSiteContent } from '../../../context/SiteContentContext'
 import { cn } from '../../../lib/utils'
+import {
+  injectJsonLd,
+  removeJsonLd,
+  getBreadcrumbSchema,
+  getDishBreadcrumbs,
+  getDishProductSchema,
+} from '../../../utils/seoSchemas'
+import { getOptimizedDishImageAlt } from '../../../utils/imageSeo'
+
+const HIGHLIGHT_CONFIG = [
+  { key: 'fresh', uiKey: 'dishModal.highlightFresh', defaultLabel: 'تحضير طازج يومياً بالرياض' },
+  { key: 'ingredients', uiKey: 'dishModal.highlightIngredients', defaultLabel: 'زيت زيتون بكر ودبس رمان أصلي' },
+  { key: 'packaging', uiKey: 'dishModal.highlightPackaging', defaultLabel: 'تغليف حراري مخصص للجمعات' },
+  { key: 'delivery', uiKey: 'dishModal.highlightDelivery', defaultLabel: 'توصيل فوري بسيارات مجهزة' },
+] as const
 
 export interface ProductLandingPageProps {
   slug: string
@@ -67,6 +82,33 @@ export const ProductLandingPage: React.FC<ProductLandingPageProps> = ({
       setSelectedVariantId('')
     }
   }, [dish?.id])
+
+  // Culinary Highlights to display for this specific dish (with local persistence fallback)
+  const activeHighlights = (() => {
+    if (!dish) return []
+    let selectedKeys = dish.highlights
+    if (!Array.isArray(selectedKeys) && typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem(`hashousha_dish_highlights_${dish.id}`)
+        if (cached) {
+          const parsed = JSON.parse(cached)
+          if (Array.isArray(parsed)) selectedKeys = parsed
+        }
+      } catch {}
+    }
+
+    return HIGHLIGHT_CONFIG
+      .filter((item) => {
+        if (Array.isArray(selectedKeys)) {
+          return selectedKeys.includes(item.key)
+        }
+        return true
+      })
+      .map((item) => ({
+        key: item.key,
+        label: t(item.uiKey, item.defaultLabel),
+      }))
+  })()
 
   // Reviews State
   const [reviews, setReviews] = useState<AdminReview[]>([])
@@ -235,48 +277,58 @@ export const ProductLandingPage: React.FC<ProductLandingPageProps> = ({
     }
     metaDesc.setAttribute('content', dish.description)
 
-    // Inject JSON-LD
+    // Update Canonical URL dynamically to prevent duplicate content
+    const dishCanonical = `https://hshosha.com/dish/${dish.slug || dish.id}`
+    let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null
+    if (!canonicalLink) {
+      canonicalLink = document.createElement('link')
+      canonicalLink.setAttribute('rel', 'canonical')
+      document.head.appendChild(canonicalLink)
+    }
+    canonicalLink.setAttribute('href', dishCanonical)
+
+    // Dynamic OpenGraph & Twitter Meta Tags for rich sharing
+    const fullDishImage = dish.image
+      ? (dish.image.startsWith('http') ? dish.image : `https://hshosha.com${dish.image.startsWith('/') ? '' : '/'}${dish.image}`)
+      : 'https://hshosha.com/images/brand-og.jpg'
+
+    const updateOrCreateMeta = (attr: 'property' | 'name', attrVal: string, content: string) => {
+      let meta = document.querySelector(`meta[${attr}="${attrVal}"]`)
+      if (!meta) {
+        meta = document.createElement('meta')
+        meta.setAttribute(attr, attrVal)
+        document.head.appendChild(meta)
+      }
+      meta.setAttribute('content', content)
+    }
+
+    updateOrCreateMeta('property', 'og:title', pageTitle)
+    updateOrCreateMeta('name', 'twitter:title', pageTitle)
+    updateOrCreateMeta('property', 'og:description', dish.description)
+    updateOrCreateMeta('name', 'twitter:description', dish.description)
+    updateOrCreateMeta('property', 'og:image', fullDishImage)
+    updateOrCreateMeta('property', 'og:image:secure_url', fullDishImage)
+    updateOrCreateMeta('name', 'twitter:image', fullDishImage)
+    updateOrCreateMeta('property', 'og:url', dishCanonical)
+
+    // Inject Product JSON-LD Schema (Google Merchant Listings 2026 Compliant)
     const ldJsonScriptId = 'product-jsonld-schema'
-    let scriptTag = document.getElementById(ldJsonScriptId) as HTMLScriptElement | null
-    if (!scriptTag) {
-      scriptTag = document.createElement('script')
-      scriptTag.id = ldJsonScriptId
-      scriptTag.type = 'application/ld+json'
-      document.head.appendChild(scriptTag)
-    }
+    injectJsonLd(ldJsonScriptId, getDishProductSchema(dish, dishCanonical))
 
-    const structuredData = {
-      '@context': 'https://schema.org/',
-      '@type': 'Product',
-      name: dish.name,
-      image: dish.image ? [dish.image] : ['https://hashousha.com/images/hero.png'],
-      description: dish.description,
-      brand: {
-        '@type': 'Brand',
-        name: 'هشوشة — Hashousha',
-      },
-      offers: {
-        '@type': 'Offer',
-        url: window.location.href,
-        priceCurrency: 'SAR',
-        price: String(dish.price),
-        availability: dish.inStock
-          ? 'https://schema.org/InStock'
-          : 'https://schema.org/OutOfStock',
-      },
-      aggregateRating: {
-        '@type': 'AggregateRating',
-        ratingValue: '4.9',
-        reviewCount: '128',
-      },
-    }
-
-    scriptTag.text = JSON.stringify(structuredData)
+    // Inject BreadcrumbList Schema for this dish
+    const dishBreadcrumbs = getDishBreadcrumbs(dish.name, dish.slug || dish.id)
+    injectJsonLd('dish-breadcrumb-schema', getBreadcrumbSchema(dishBreadcrumbs))
 
     return () => {
       // Cleanup custom JSON-LD when unmounting
-      const tag = document.getElementById(ldJsonScriptId)
-      if (tag) tag.remove()
+      removeJsonLd(ldJsonScriptId)
+      removeJsonLd('dish-breadcrumb-schema')
+
+      // Restore default canonical URL
+      const cLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null
+      if (cLink) {
+        cLink.setAttribute('href', 'https://hshosha.com/')
+      }
     }
   }, [dish])
 
@@ -382,7 +434,7 @@ export const ProductLandingPage: React.FC<ProductLandingPageProps> = ({
               )}
               <img
                 src={dish.image || '/images/warak-enab.png'}
-                alt={dish.imageAlt || dish.name}
+                alt={getOptimizedDishImageAlt(dish)}
                 onLoad={() => setImgLoaded(true)}
                 className={cn(
                   'relative z-10 h-full w-full object-cover transition-all duration-700 hover:scale-105',
@@ -513,19 +565,42 @@ export const ProductLandingPage: React.FC<ProductLandingPageProps> = ({
                 </p>
               </div>
 
-              {/* Hotel-Grade Hospitality Serving Tip */}
-              <div className="rounded-xl border border-primary/15 bg-secondary/60 p-3.5 flex items-start gap-2.5 text-xs">
-                <UtensilsCrossed className="size-4 text-primary shrink-0 mt-0.5" />
-                <div className="space-y-0.5">
-                  <p className="font-bold text-primary text-[11px]">
-                    {t('landing.servingTipTitle', 'سر التقديم الفندقي لضيوفكم:')}
-                  </p>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed">
-                    {t('landing.servingTipText', 'يُفضل تقديمه بدرجة حرارة الغرفة (أو دافئاً قليلاً)، مع سكب صوص دبس الرمان الإضافي وتزيينه بشرائح الليمون الأصفر وحبوب الرمان الطازجة.')}
-                  </p>
+              {/* Hotel-Grade Hospitality Serving Tip (Controlled per dish) */}
+              {dish.showPreparationTip !== false && (
+                <div className="rounded-xl border border-primary/15 bg-secondary/60 p-3.5 flex items-start gap-2.5 text-xs">
+                  <UtensilsCrossed className="size-4 text-primary shrink-0 mt-0.5" />
+                  <div className="space-y-0.5">
+                    <p className="font-bold text-primary text-[11px]">
+                      {t('landing.servingTipTitle', 'سر التقديم الفندقي لضيوفكم:')}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed whitespace-pre-line">
+                      {dish.preparationTip?.trim() ||
+                        t(
+                          'landing.servingTipText',
+                          'يُفضل تقديمه بدرجة حرارة الغرفة (أو دافئاً قليلاً)، مع سكب صوص دبس الرمان الإضافي وتزيينه بشرائح الليمون الأصفر وحبوب الرمان الطازجة.'
+                        )}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
+
+            {/* Culinary Highlights / Quality Guarantee (Controlled per dish) */}
+            {activeHighlights.length > 0 && (
+              <div
+                className={cn(
+                  'p-4 rounded-2xl bg-secondary/50 border border-primary/10 text-xs transition-all',
+                  activeHighlights.length === 1 ? 'grid grid-cols-1 gap-2' : 'grid grid-cols-2 gap-3'
+                )}
+              >
+                {activeHighlights.map((item) => (
+                  <div key={item.key} className="flex items-center gap-2 text-foreground/80">
+                    <span className="size-2 rounded-full bg-primary shrink-0" />
+                    <span>{item.label}</span>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Riyadh Delivery Note */}
             <div className="rounded-2xl border border-primary/20 bg-secondary/40 p-3.5 text-xs text-foreground/80 space-y-1">
@@ -843,7 +918,7 @@ export const ProductLandingPage: React.FC<ProductLandingPageProps> = ({
                       <div className="relative aspect-[16/10] rounded-xl overflow-hidden bg-[#ebdccb]">
                         <img
                           src={item.image || '/images/warak-enab.png'}
-                          alt={item.name}
+                          alt={getOptimizedDishImageAlt(item)}
                           loading="lazy"
                           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />

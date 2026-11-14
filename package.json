@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "node scripts/generate-sitemap.mjs && tsc && vite build",
+    "postbuild": "node scripts/prerender-dish-og.mjs",
+    "sitemap": "node scripts/generate-sitemap.mjs",
+    "prerender": "node scripts/prerender-dish-og.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
