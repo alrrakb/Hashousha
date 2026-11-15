@@ -24,20 +24,38 @@ build/
 Thumbs.db
 .freebuff/
 
-# Logs
+# AI Systems, Agents & Task Workflows
+.agents/
+.gemini/
+.cursor/
+.windsurf/
+tasks/
+AGENT_RULES.md
+PROJECT_STATE.json
+skills-lock.json
+SYSTEM_ARCHITECTURE_DOSSIER.md
+
+# Reports & Executive Presentations
+reports/
+*.pdf
+Hashousha_Infrastructure_Report*
+docs/*.pdf
+docs/*.html
+docs/LEGACY_SYSTEM_AUDIT.md
+docs/PROJECT_STATE.md
+
+# Logs & Temporary Files
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 *.log
-!tasks/**/*.log
-
-# Temporary & Cache
 .eslintcache
 .stylelintcache
 *.tsbuildinfo
 scratch/
 old_store/
 
+# Hosting
 .vercel
