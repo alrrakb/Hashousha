@@ -105,6 +105,7 @@ interface CloudDishRow {
   slug?: string
   description: string
   long_description?: string
+  ingredients?: string
   serving_info?: string
   price: number
   unit: string
@@ -119,6 +120,7 @@ interface CloudDishRow {
   seo_description?: string
   seo_keywords?: string[]
   highlights?: string[]
+  highlight_labels?: Record<string, string>
   preparation_tip?: string
   show_preparation_tip?: boolean
 }
@@ -131,27 +133,50 @@ export async function fetchDishesFromSupabase(): Promise<Dish[]> {
     }
 
     return data.map((d: CloudDishRow) => {
+      let parsedMeta: any = null
+      if (d.ingredients) {
+        try {
+          parsedMeta = typeof d.ingredients === 'string' ? JSON.parse(d.ingredients) : d.ingredients
+        } catch {}
+      }
+
       let localHighlights: string[] | undefined = undefined
+      let localHighlightLabels: Record<string, string> | undefined = undefined
       let localPrepTip: string | undefined = undefined
       let localShowPrep: boolean | undefined = undefined
 
       if (typeof window !== 'undefined') {
         try {
-          const rawH = localStorage.getItem(`hashousha_dish_highlights_${d.id}`)
+          const rawH = localStorage.getItem(`hashousha_dish_highlights_${d.id}`) || (d.slug ? localStorage.getItem(`hashousha_dish_highlights_${d.slug}`) : null)
           if (rawH) {
             const parsed = JSON.parse(rawH)
             if (Array.isArray(parsed)) localHighlights = parsed
           }
-          const rawP = localStorage.getItem(`hashousha_dish_prep_tip_${d.id}`)
-          if (rawP !== null) localPrepTip = rawP
-          const rawS = localStorage.getItem(`hashousha_dish_show_prep_${d.id}`)
+          const rawHL = localStorage.getItem(`hashousha_dish_highlight_labels_${d.id}`) || (d.slug ? localStorage.getItem(`hashousha_dish_highlight_labels_${d.slug}`) : null)
+          if (rawHL) {
+            const parsed = JSON.parse(rawHL)
+            if (parsed && typeof parsed === 'object') localHighlightLabels = parsed
+          }
+          const rawP = localStorage.getItem(`hashousha_dish_prep_tip_${d.id}`) || (d.slug ? localStorage.getItem(`hashousha_dish_prep_tip_${d.slug}`) : null)
+          if (rawP !== null && rawP.trim()) localPrepTip = rawP.trim()
+          const rawS = localStorage.getItem(`hashousha_dish_show_prep_${d.id}`) || (d.slug ? localStorage.getItem(`hashousha_dish_show_prep_${d.slug}`) : null)
           if (rawS !== null) localShowPrep = rawS === 'true'
         } catch {}
       }
 
       const finalHighlights = Array.isArray(d.highlights)
         ? d.highlights
-        : (Array.isArray(localHighlights) ? localHighlights : undefined)
+        : (Array.isArray(parsedMeta?.highlights)
+            ? parsedMeta.highlights
+            : (Array.isArray(localHighlights) ? localHighlights : undefined))
+
+      const finalHighlightLabels = d.highlight_labels || parsedMeta?.highlightLabels || localHighlightLabels || undefined
+      const finalPrepTip = d.preparation_tip || parsedMeta?.preparationTip || localPrepTip || undefined
+      const finalShowPrep = d.show_preparation_tip !== undefined
+        ? d.show_preparation_tip
+        : (parsedMeta?.showPreparationTip !== undefined
+            ? parsedMeta.showPreparationTip
+            : (localShowPrep !== undefined ? localShowPrep : true))
 
       return {
         id: d.id,
@@ -174,10 +199,9 @@ export async function fetchDishesFromSupabase(): Promise<Dish[]> {
         seoDescription: d.seo_description,
         seoKeywords: Array.isArray(d.seo_keywords) ? d.seo_keywords : undefined,
         highlights: finalHighlights,
-        preparationTip: d.preparation_tip || localPrepTip || undefined,
-        showPreparationTip: d.show_preparation_tip !== undefined
-          ? d.show_preparation_tip
-          : (localShowPrep !== undefined ? localShowPrep : undefined),
+        highlightLabels: finalHighlightLabels,
+        preparationTip: finalPrepTip,
+        showPreparationTip: finalShowPrep,
       }
     })
   } catch (err) {
@@ -188,18 +212,26 @@ export async function fetchDishesFromSupabase(): Promise<Dish[]> {
 
 export async function saveDishToSupabase(dish: Dish): Promise<{ success: boolean; error?: string }> {
   try {
-    // 1. Immediately persist highlights and preparation tip to localStorage for instant resilience
+    // 1. Immediately persist highlights, highlightLabels, and preparation tip to localStorage for instant resilience
     if (typeof window !== 'undefined') {
       try {
         if (dish.highlights !== undefined) {
           localStorage.setItem(`hashousha_dish_highlights_${dish.id}`, JSON.stringify(dish.highlights))
+          if (dish.slug) localStorage.setItem(`hashousha_dish_highlights_${dish.slug}`, JSON.stringify(dish.highlights))
+        }
+        if (dish.highlightLabels !== undefined) {
+          localStorage.setItem(`hashousha_dish_highlight_labels_${dish.id}`, JSON.stringify(dish.highlightLabels))
+          if (dish.slug) localStorage.setItem(`hashousha_dish_highlight_labels_${dish.slug}`, JSON.stringify(dish.highlightLabels))
         }
         if (dish.preparationTip !== undefined) {
           localStorage.setItem(`hashousha_dish_prep_tip_${dish.id}`, dish.preparationTip || '')
+          if (dish.slug) localStorage.setItem(`hashousha_dish_prep_tip_${dish.slug}`, dish.preparationTip || '')
         }
         if (dish.showPreparationTip !== undefined) {
           localStorage.setItem(`hashousha_dish_show_prep_${dish.id}`, String(dish.showPreparationTip))
+          if (dish.slug) localStorage.setItem(`hashousha_dish_show_prep_${dish.slug}`, String(dish.showPreparationTip))
         }
+        window.dispatchEvent(new CustomEvent('hashousha_dishes_updated', { detail: dish }))
       } catch (e) {
         console.warn('Could not cache dish customizations locally:', e)
       }
@@ -208,6 +240,14 @@ export async function saveDishToSupabase(dish: Dish): Promise<{ success: boolean
     const finalCategories = Array.isArray(dish.categories) && dish.categories.length > 0
       ? dish.categories
       : (dish.category ? [dish.category] : [])
+
+    // Pack rich metadata into ingredients column for guaranteed cloud persistence
+    const dishMeta = {
+      preparationTip: dish.preparationTip || null,
+      showPreparationTip: dish.showPreparationTip !== false,
+      highlights: Array.isArray(dish.highlights) ? dish.highlights : null,
+      highlightLabels: dish.highlightLabels || null,
+    }
 
     const payload: Record<string, any> = {
       id: dish.id,
@@ -229,6 +269,7 @@ export async function saveDishToSupabase(dish: Dish): Promise<{ success: boolean
       seo_title: dish.seoTitle || null,
       seo_description: dish.seoDescription || null,
       seo_keywords: Array.isArray(dish.seoKeywords) ? dish.seoKeywords : [],
+      ingredients: JSON.stringify(dishMeta),
       highlights: Array.isArray(dish.highlights) ? dish.highlights : null,
       preparation_tip: dish.preparationTip || null,
       show_preparation_tip: dish.showPreparationTip !== undefined ? dish.showPreparationTip : null,
@@ -260,6 +301,13 @@ export async function saveDishesBulkToSupabase(dishesToSave: Dish[]): Promise<{ 
         ? dish.categories
         : (dish.category ? [dish.category] : [])
 
+      const dishMeta = {
+        preparationTip: dish.preparationTip || null,
+        showPreparationTip: dish.showPreparationTip !== false,
+        highlights: Array.isArray(dish.highlights) ? dish.highlights : null,
+        highlightLabels: dish.highlightLabels || null,
+      }
+
       return {
         id: dish.id,
         name: dish.name,
@@ -280,6 +328,7 @@ export async function saveDishesBulkToSupabase(dishesToSave: Dish[]): Promise<{ 
         seo_title: dish.seoTitle || null,
         seo_description: dish.seoDescription || null,
         seo_keywords: Array.isArray(dish.seoKeywords) ? dish.seoKeywords : [],
+        ingredients: JSON.stringify(dishMeta),
         highlights: Array.isArray(dish.highlights) ? dish.highlights : null,
         preparation_tip: dish.preparationTip || null,
         show_preparation_tip: dish.showPreparationTip !== undefined ? dish.showPreparationTip : null,

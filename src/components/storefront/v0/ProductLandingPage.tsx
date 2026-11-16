@@ -97,6 +97,19 @@ export const ProductLandingPage: React.FC<ProductLandingPageProps> = ({
       } catch {}
     }
 
+    let localLabels: Record<string, string> = dish?.highlightLabels || {}
+    if (dish && typeof window !== 'undefined') {
+      try {
+        const cachedL = localStorage.getItem(`hashousha_dish_highlight_labels_${dish.id}`) || (dish.slug ? localStorage.getItem(`hashousha_dish_highlight_labels_${dish.slug}`) : null)
+        if (cachedL) {
+          const parsedL = JSON.parse(cachedL)
+          if (parsedL && typeof parsedL === 'object') {
+            localLabels = { ...parsedL, ...localLabels }
+          }
+        }
+      } catch {}
+    }
+
     return HIGHLIGHT_CONFIG
       .filter((item) => {
         if (Array.isArray(selectedKeys)) {
@@ -106,8 +119,22 @@ export const ProductLandingPage: React.FC<ProductLandingPageProps> = ({
       })
       .map((item) => ({
         key: item.key,
-        label: t(item.uiKey, item.defaultLabel),
+        label: localLabels[item.key]?.trim() || t(item.uiKey, item.defaultLabel),
       }))
+  })()
+
+  // Effective Preparation Tip resolution
+  const effectivePreparationTip = dish?.preparationTip?.trim() || (() => {
+    if (typeof window !== 'undefined' && dish) {
+      try {
+        const local = localStorage.getItem(`hashousha_dish_prep_tip_${dish.id}`) || (dish.slug ? localStorage.getItem(`hashousha_dish_prep_tip_${dish.slug}`) : null)
+        if (local && local.trim()) return local.trim()
+      } catch {}
+    }
+    return t(
+      'landing.servingTipText',
+      'يُفضل تقديمه بدرجة حرارة الغرفة (أو دافئاً قليلاً)، مع سكب صوص دبس الرمان الإضافي وتزيينه بشرائح الليمون الأصفر وحبوب الرمان الطازجة.'
+    )
   })()
 
   // Reviews State
@@ -574,11 +601,7 @@ export const ProductLandingPage: React.FC<ProductLandingPageProps> = ({
                       {t('landing.servingTipTitle', 'سر التقديم الفندقي لضيوفكم:')}
                     </p>
                     <p className="text-[11px] text-muted-foreground leading-relaxed whitespace-pre-line">
-                      {dish.preparationTip?.trim() ||
-                        t(
-                          'landing.servingTipText',
-                          'يُفضل تقديمه بدرجة حرارة الغرفة (أو دافئاً قليلاً)، مع سكب صوص دبس الرمان الإضافي وتزيينه بشرائح الليمون الأصفر وحبوب الرمان الطازجة.'
-                        )}
+                      {effectivePreparationTip}
                     </p>
                   </div>
                 </div>

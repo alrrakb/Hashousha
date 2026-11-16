@@ -71,10 +71,23 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
     let selectedKeys = dish.highlights
     if (!Array.isArray(selectedKeys) && typeof window !== 'undefined') {
       try {
-        const cached = localStorage.getItem(`hashousha_dish_highlights_${dish.id}`)
+        const cached = localStorage.getItem(`hashousha_dish_highlights_${dish.id}`) || (dish.slug ? localStorage.getItem(`hashousha_dish_highlights_${dish.slug}`) : null)
         if (cached) {
           const parsed = JSON.parse(cached)
           if (Array.isArray(parsed)) selectedKeys = parsed
+        }
+      } catch {}
+    }
+
+    let localLabels: Record<string, string> = dish.highlightLabels || {}
+    if (typeof window !== 'undefined') {
+      try {
+        const cachedL = localStorage.getItem(`hashousha_dish_highlight_labels_${dish.id}`) || (dish.slug ? localStorage.getItem(`hashousha_dish_highlight_labels_${dish.slug}`) : null)
+        if (cachedL) {
+          const parsedL = JSON.parse(cachedL)
+          if (parsedL && typeof parsedL === 'object') {
+            localLabels = { ...parsedL, ...localLabels }
+          }
         }
       } catch {}
     }
@@ -89,8 +102,22 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
       })
       .map((item) => ({
         key: item.key,
-        label: t(item.uiKey, item.defaultLabel),
+        label: localLabels[item.key]?.trim() || t(item.uiKey, item.defaultLabel),
       }))
+  })()
+
+  // Effective Preparation Tip resolution
+  const effectivePreparationTip = dish?.preparationTip?.trim() || (() => {
+    if (typeof window !== 'undefined' && dish) {
+      try {
+        const local = localStorage.getItem(`hashousha_dish_prep_tip_${dish.id}`) || (dish.slug ? localStorage.getItem(`hashousha_dish_prep_tip_${dish.slug}`) : null)
+        if (local && local.trim()) return local.trim()
+      } catch {}
+    }
+    return t(
+      'dishModal.servingTipText',
+      'يُفضل التقديم بدرجة حرارة الغرفة (أو دافئاً قليلاً)، مع سكب صوص دبس الرمان الفاخر وتزيينه بحبات الرمان الطازجة وشرائح الليمون.'
+    )
   })()
 
   // PushState URL synchronization, Canonical Tag & Breadcrumb Schema management
@@ -340,11 +367,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     {t('dishModal.servingTipTitle', 'طريقة التقديم الفندقية المقترحة:')}
                   </p>
                   <p className="text-[11px] text-muted-foreground leading-relaxed whitespace-pre-line">
-                    {dish.preparationTip?.trim() ||
-                      t(
-                        'dishModal.servingTipText',
-                        'يُفضل التقديم بدرجة حرارة الغرفة (أو دافئاً قليلاً)، مع سكب صوص دبس الرمان الفاخر وتزيينه بحبات الرمان الطازجة وشرائح الليمون.'
-                      )}
+                    {effectivePreparationTip}
                   </p>
                 </div>
               </div>

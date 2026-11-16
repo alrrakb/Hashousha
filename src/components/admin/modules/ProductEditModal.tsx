@@ -12,10 +12,12 @@ import {
   Plus,
   Trash2,
   Tag,
+  Edit3,
+  RotateCcw,
 } from 'lucide-react'
 import { Dish, BadgeKind, DishVariant } from '../../../types/menu'
 import { AdminCategory, AdminBadge } from '../../../types/admin'
-import { uploadDishImage } from '../../../services/adminService'
+import { uploadDishImage, saveSiteContent } from '../../../services/adminService'
 import { optimizeImageToWebp, OPTIMIZER_PRESETS, formatFileSize } from '../../../utils/imageOptimizer'
 import { getBadges, getBadgeIcon, BADGE_CHANNEL_NAME } from '../../../services/badgeService'
 import { useSiteContent } from '../../../context/SiteContentContext'
@@ -54,15 +56,30 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
   const [seoKeywords, setSeoKeywords] = useState<string[]>(dish?.seoKeywords || [])
   const [keywordInput, setKeywordInput] = useState('')
 
-  const { t } = useSiteContent()
+  const { t, content, reload: reloadSiteContent } = useSiteContent()
 
   // Preparation & Serving Tip (طريقة التحضير والتقديم المقترحة)
-  const [showPreparationTip, setShowPreparationTip] = useState<boolean>(
-    dish?.showPreparationTip !== undefined ? dish.showPreparationTip : true
-  )
-  const [preparationTip, setPreparationTip] = useState<string>(
-    dish?.preparationTip || ''
-  )
+  const [showPreparationTip, setShowPreparationTip] = useState<boolean>(() => {
+    if (dish?.showPreparationTip !== undefined) return dish.showPreparationTip
+    if (dish?.id && typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem(`hashousha_dish_show_prep_${dish.id}`) || (dish.slug ? localStorage.getItem(`hashousha_dish_show_prep_${dish.slug}`) : null)
+        if (cached !== null) return cached === 'true'
+      } catch {}
+    }
+    return true
+  })
+
+  const [preparationTip, setPreparationTip] = useState<string>(() => {
+    if (dish?.preparationTip) return dish.preparationTip
+    if (dish?.id && typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem(`hashousha_dish_prep_tip_${dish.id}`) || (dish.slug ? localStorage.getItem(`hashousha_dish_prep_tip_${dish.slug}`) : null)
+        if (cached && cached.trim()) return cached.trim()
+      } catch {}
+    }
+    return ''
+  })
 
   // 4 Culinary Highlights Checkbox State
   const [highlights, setHighlights] = useState<string[]>(() => {
@@ -71,7 +88,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
     }
     if (dish?.id && typeof window !== 'undefined') {
       try {
-        const cached = localStorage.getItem(`hashousha_dish_highlights_${dish.id}`)
+        const cached = localStorage.getItem(`hashousha_dish_highlights_${dish.id}`) || (dish.slug ? localStorage.getItem(`hashousha_dish_highlights_${dish.slug}`) : null)
         if (cached) {
           const parsed = JSON.parse(cached)
           if (Array.isArray(parsed)) return parsed
@@ -82,6 +99,36 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
     return ['fresh', 'ingredients', 'packaging', 'delivery']
   })
 
+  // 4 Culinary Highlights Custom Text State (Editable directly in this modal)
+  const [highlightLabels, setHighlightLabels] = useState<Record<string, string>>(() => {
+    const initial: Record<string, string> = {
+      fresh: dish?.highlightLabels?.fresh || '',
+      ingredients: dish?.highlightLabels?.ingredients || '',
+      packaging: dish?.highlightLabels?.packaging || '',
+      delivery: dish?.highlightLabels?.delivery || '',
+    }
+    if (dish?.id && typeof window !== 'undefined') {
+      try {
+        const cachedL = localStorage.getItem(`hashousha_dish_highlight_labels_${dish.id}`) || (dish.slug ? localStorage.getItem(`hashousha_dish_highlight_labels_${dish.slug}`) : null)
+        if (cachedL) {
+          const parsedL = JSON.parse(cachedL)
+          if (parsedL && typeof parsedL === 'object') {
+            return {
+              fresh: dish?.highlightLabels?.fresh || parsedL.fresh || '',
+              ingredients: dish?.highlightLabels?.ingredients || parsedL.ingredients || '',
+              packaging: dish?.highlightLabels?.packaging || parsedL.packaging || '',
+              delivery: dish?.highlightLabels?.delivery || parsedL.delivery || '',
+            }
+          }
+        }
+      } catch {}
+    }
+    return initial
+  })
+
+  // Toggle to optionally propagate custom highlight texts as global defaults
+  const [saveAsGlobalHighlights, setSaveAsGlobalHighlights] = useState<boolean>(false)
+
   const handleToggleHighlight = (key: string) => {
     setHighlights((prev) =>
       prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
@@ -91,22 +138,30 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
   const highlightOptions = [
     {
       key: 'fresh',
-      label: t('dishModal.highlightFresh', 'تحضير طازج يومياً بالرياض'),
+      uiKey: 'dishModal.highlightFresh',
+      defaultLabel: 'تحضير طازج يومياً بالرياض',
+      currentLabel: highlightLabels.fresh.trim() || t('dishModal.highlightFresh', 'تحضير طازج يومياً بالرياض'),
       hint: 'يؤكد للعميل أن المخبوزات والطبق يُحضّر طازجاً في نفس يوم الطلب',
     },
     {
       key: 'ingredients',
-      label: t('dishModal.highlightIngredients', 'زيت زيتون بكر ودبس رمان أصلي'),
+      uiKey: 'dishModal.highlightIngredients',
+      defaultLabel: 'زيت زيتون بكر ودبس رمان أصلي',
+      currentLabel: highlightLabels.ingredients.trim() || t('dishModal.highlightIngredients', 'زيت زيتون بكر ودبس رمان أصلي'),
       hint: 'أبرز مكونات التحضير الفاخرة للطبق (مناسب للأصناف المالحة والتقليدية)',
     },
     {
       key: 'packaging',
-      label: t('dishModal.highlightPackaging', 'تغليف حراري مخصص للجمعات'),
+      uiKey: 'dishModal.highlightPackaging',
+      defaultLabel: 'تغليف حراري مخصص للجمعات',
+      currentLabel: highlightLabels.packaging.trim() || t('dishModal.highlightPackaging', 'تغليف حراري مخصص للجمعات'),
       hint: 'يظهر ميزة الصواني والبوكسات الحرارية الحافظة للحرارة والطراوة',
     },
     {
       key: 'delivery',
-      label: t('dishModal.highlightDelivery', 'توصيل فوري لكافة أحياء الرياض'),
+      uiKey: 'dishModal.highlightDelivery',
+      defaultLabel: 'توصيل فوري لكافة أحياء الرياض',
+      currentLabel: highlightLabels.delivery.trim() || t('dishModal.highlightDelivery', 'توصيل فوري لكافة أحياء الرياض'),
       hint: 'ضمان وصول الطلب بحالته المثالية وطازجاً لكافة أحياء الرياض',
     },
   ]
@@ -249,6 +304,12 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
     const finalSlug = slug.trim() || `dish-${Date.now()}`
     const finalId = dish?.id || `dish_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`
 
+    const cleanedHighlightLabels = Object.fromEntries(
+      Object.entries(highlightLabels)
+        .map(([k, v]) => [k, v.trim()])
+        .filter(([_, v]) => v.length > 0)
+    )
+
     const updatedDish: Dish = {
       id: finalId,
       name: name.trim(),
@@ -270,11 +331,33 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
       seoKeywords: seoKeywords.length > 0 ? seoKeywords : undefined,
       variants: hasVariants && variants.length > 0 ? variants : undefined,
       highlights,
+      highlightLabels: Object.keys(cleanedHighlightLabels).length > 0 ? cleanedHighlightLabels : undefined,
       showPreparationTip,
       preparationTip: preparationTip.trim() || undefined,
     }
 
     try {
+      if (saveAsGlobalHighlights) {
+        try {
+          const globalUiUpdates: Record<string, string> = {}
+          if (highlightLabels.fresh?.trim()) globalUiUpdates['dishModal.highlightFresh'] = highlightLabels.fresh.trim()
+          if (highlightLabels.ingredients?.trim()) globalUiUpdates['dishModal.highlightIngredients'] = highlightLabels.ingredients.trim()
+          if (highlightLabels.packaging?.trim()) globalUiUpdates['dishModal.highlightPackaging'] = highlightLabels.packaging.trim()
+          if (highlightLabels.delivery?.trim()) globalUiUpdates['dishModal.highlightDelivery'] = highlightLabels.delivery.trim()
+          if (Object.keys(globalUiUpdates).length > 0) {
+            await saveSiteContent({
+              uiStrings: {
+                ...(content.uiStrings || {}),
+                ...globalUiUpdates,
+              },
+            })
+            await reloadSiteContent()
+          }
+        } catch (e) {
+          console.warn('Could not save global highlight labels:', e)
+        }
+      }
+
       await onSave(updatedDish)
       onClose()
     } catch (err: unknown) {
@@ -597,40 +680,116 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
             </div>
 
             <p className="text-[11px] text-muted-foreground leading-relaxed">
-              اختر المزايا التي تنطبق على هذا الصنف لعرضها في نافذة تفاصيل الطبق للمستهلك. الميزة المحددة ستظهر بداخل بطاقة الطبق، وغير المحددة ستُخفى تلقائياً:
+              اختر المزايا التي تنطبق على هذا الصنف لعرضها في بطاقة تفاصيل الطبق للمستهلك، ويمكنك تعديل وكتابة نص الميزة بحرية مباشرة من الحقول أدناه:
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
               {highlightOptions.map((opt) => {
                 const isChecked = highlights.includes(opt.key)
+                const customVal = highlightLabels[opt.key] !== undefined ? highlightLabels[opt.key] : ''
                 return (
-                  <label
+                  <div
                     key={opt.key}
                     className={cn(
-                      'flex items-start gap-3 p-3 rounded-xl border text-xs cursor-pointer transition-all select-none',
+                      'p-3.5 rounded-2xl border text-xs transition-all space-y-2.5',
                       isChecked
-                        ? 'border-primary bg-primary/10 text-primary ring-1 ring-primary/30 shadow-xs'
-                        : 'border-border/80 bg-background/80 text-foreground/80 hover:bg-secondary'
+                        ? 'border-primary/50 bg-background/95 text-foreground ring-1 ring-primary/25 shadow-xs'
+                        : 'border-border/60 bg-background/40 opacity-75 hover:opacity-90'
                     )}
                   >
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={() => handleToggleHighlight(opt.key)}
-                      className="mt-0.5 size-4 rounded border-primary/30 text-primary focus:ring-primary/40 cursor-pointer"
-                    />
-                    <div className="flex-1 space-y-0.5">
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-xs">{opt.label}</span>
-                        {isChecked && <Check className="size-3.5 text-primary shrink-0" />}
-                      </div>
-                      <p className="text-[10px] text-muted-foreground font-normal leading-tight">
-                        {opt.hint}
-                      </p>
+                    {/* Header: Toggle Checkbox + Status */}
+                    <div className="flex items-center justify-between gap-2 border-b border-border/40 pb-2">
+                      <label className="flex items-center gap-2 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => handleToggleHighlight(opt.key)}
+                          className="size-4 rounded border-primary/40 text-primary focus:ring-primary/40 cursor-pointer"
+                        />
+                        <span className="font-bold text-xs text-foreground">
+                          {isChecked ? 'ميزة معروضة للطبق' : 'ميزة مستبعدة'}
+                        </span>
+                      </label>
+                      <span
+                        className={cn(
+                          'text-[10px] px-2 py-0.5 rounded-full font-bold',
+                          isChecked ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'
+                        )}
+                      >
+                        {isChecked ? 'مفعلة' : 'مخفية'}
+                      </span>
                     </div>
-                  </label>
+
+                    {/* Editable Title Input */}
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-[10.5px]">
+                        <span className="font-semibold text-foreground/80 flex items-center gap-1">
+                          <Edit3 className="size-3 text-primary" />
+                          <span>نص الميزة للعميل:</span>
+                        </span>
+                        {customVal.trim().length > 0 && customVal.trim() !== opt.defaultLabel && (
+                          <button
+                            type="button"
+                            onClick={() => setHighlightLabels((prev) => ({ ...prev, [opt.key]: '' }))}
+                            className="text-[9.5px] text-primary hover:underline"
+                          >
+                            استعادة الافتراضي
+                          </button>
+                        )}
+                      </div>
+                      <input
+                        type="text"
+                        value={customVal !== '' ? customVal : opt.currentLabel}
+                        onChange={(e) => {
+                          const val = e.target.value
+                          setHighlightLabels((prev) => ({ ...prev, [opt.key]: val }))
+                        }}
+                        placeholder={opt.defaultLabel}
+                        className={cn(
+                          'w-full rounded-xl border px-3 py-2 text-xs font-bold transition-all focus:outline-none',
+                          isChecked
+                            ? 'border-primary/30 bg-background text-foreground focus:border-primary focus:ring-1 focus:ring-primary/30'
+                            : 'border-border/60 bg-muted/30 text-muted-foreground'
+                        )}
+                      />
+                    </div>
+
+                    {/* Subtitle / Hint */}
+                    <p className="text-[10px] text-muted-foreground font-normal leading-tight">
+                      {opt.hint}
+                    </p>
+                  </div>
                 )
               })}
+            </div>
+
+            {/* Bottom Controls: Save as Global Default & Reset */}
+            <div className="pt-2 border-t border-primary/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
+              <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-foreground/90 font-medium">
+                <input
+                  type="checkbox"
+                  checked={saveAsGlobalHighlights}
+                  onChange={(e) => setSaveAsGlobalHighlights(e.target.checked)}
+                  className="size-4 rounded border-primary/40 text-primary focus:ring-primary/40 cursor-pointer"
+                />
+                <span>تعميم هذه النصوص كافتراضية لكافة أطباق المتجر (تحديث المظهر والمحتوى تلقائياً)</span>
+              </label>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setHighlightLabels({
+                    fresh: '',
+                    ingredients: '',
+                    packaging: '',
+                    delivery: '',
+                  })
+                }}
+                className="text-[11px] text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 shrink-0"
+              >
+                <RotateCcw className="size-3" />
+                <span>إعادة ضبط النصوص للافتراضي</span>
+              </button>
             </div>
           </div>
 
@@ -679,11 +838,38 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
               <div className="space-y-2 pt-1 animate-in fade-in-50 duration-200">
                 <div className="flex items-center justify-between">
                   <label htmlFor="dish-preparation-tip" className="text-[11px] font-bold text-foreground">
-                    نص طريقة التحضير والتقديم المقترحة:
+                    نص طريقة التحضير والتقديم المقترحة للطبق:
                   </label>
-                  <span className="text-[10px] text-muted-foreground">
-                    {preparationTip.length} حرف
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {!preparationTip && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setPreparationTip(
+                            t(
+                              'dishModal.servingTipText',
+                              'يُفضل التقديم بدرجة حرارة الغرفة (أو دافئاً قليلاً)، مع سكب صوص دبس الرمان الفاخر وتزيينه بحبات الرمان الطازجة وشرائح الليمون.'
+                            )
+                          )
+                        }
+                        className="text-[10px] text-primary hover:underline font-semibold"
+                      >
+                        نسخ النص الافتراضي للتعديل عليه
+                      </button>
+                    )}
+                    {preparationTip && (
+                      <button
+                        type="button"
+                        onClick={() => setPreparationTip('')}
+                        className="text-[10px] text-muted-foreground hover:text-red-600 transition-colors"
+                      >
+                        مسح (استخدام الافتراضي)
+                      </button>
+                    )}
+                    <span className="text-[10px] text-muted-foreground font-mono">
+                      {preparationTip.length} حرف
+                    </span>
+                  </div>
                 </div>
                 <textarea
                   id="dish-preparation-tip"
@@ -694,9 +880,9 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
                   className="w-full rounded-xl border border-border bg-background p-3 text-xs leading-relaxed focus:border-primary focus:outline-none"
                 />
                 <div className="rounded-xl bg-background/60 border border-primary/10 p-2.5 flex items-start gap-2 text-[10.5px] text-muted-foreground leading-relaxed">
-                  <span className="text-primary font-bold shrink-0">💡 ملاحظة:</span>
+                  <span className="text-primary font-bold shrink-0">💡 توضيح:</span>
                   <span>
-                    عنوان هذه الجزئية يتم التحكم به وتعديله من صفحة <span className="font-bold text-foreground">"المظهر والمحتوى"</span> ولا يتم تغييره من هنا لضمان اتساق هوية البراند.
+                    أي نص تكتبه هنا سيظهر فورياً للعميل داخل بطاقة هذا الصنف في المتجر، ويتم حفظه سحابياً ومحلياً لضمان عدم فقدانه. عند ترك الحقل فارغاً، يُعتمد النص الافتراضي العام.
                   </span>
                 </div>
               </div>

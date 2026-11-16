@@ -58,13 +58,35 @@ export const App: React.FC = () => {
     return false
   })
 
-  // Fetch latest dishes from Supabase to ensure fresh catalog
+  // Fetch latest dishes from Supabase to ensure fresh catalog & listen for updates
   useEffect(() => {
-    fetchDishesFromSupabase().then((cloudDishes) => {
-      if (cloudDishes && cloudDishes.length > 0) {
-        useMenuStore.getState().setDishes(cloudDishes)
+    const syncDishes = () => {
+      fetchDishesFromSupabase().then((cloudDishes) => {
+        if (cloudDishes && cloudDishes.length > 0) {
+          useMenuStore.getState().setDishes(cloudDishes)
+        }
+      })
+    }
+
+    syncDishes()
+
+    const handleDishesUpdated = (e: Event) => {
+      const customEvent = e as CustomEvent<Dish>
+      if (customEvent.detail) {
+        const updated = customEvent.detail
+        const currentDishes = useMenuStore.getState().dishes
+        const next = currentDishes.map((d) => (d.id === updated.id ? updated : d))
+        useMenuStore.getState().setDishes(next)
+      } else {
+        syncDishes()
       }
-    })
+    }
+
+    window.addEventListener('hashousha_dishes_updated', handleDishesUpdated)
+
+    return () => {
+      window.removeEventListener('hashousha_dishes_updated', handleDishesUpdated)
+    }
   }, [])
 
   // Listen to browser navigation popstate / hashchange

@@ -44,6 +44,7 @@ export interface Dish {
   seoDescription?: string
   seoKeywords?: string[]
   highlights?: string[]
+  highlightLabels?: Partial<Record<DishHighlightKey, string>>
   preparationTip?: string
   showPreparationTip?: boolean
 }
