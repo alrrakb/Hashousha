@@ -56,7 +56,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
   const [seoKeywords, setSeoKeywords] = useState<string[]>(dish?.seoKeywords || [])
   const [keywordInput, setKeywordInput] = useState('')
 
-  const { t, content, reload: reloadSiteContent } = useSiteContent()
+  const { t, content, reload: reloadSiteContent, updateContentLocally } = useSiteContent()
 
   // Preparation & Serving Tip (طريقة التحضير والتقديم المقترحة)
   const [showPreparationTip, setShowPreparationTip] = useState<boolean>(() => {
@@ -99,35 +99,13 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
     return ['fresh', 'ingredients', 'packaging', 'delivery']
   })
 
-  // 4 Culinary Highlights Custom Text State (Editable directly in this modal)
-  const [highlightLabels, setHighlightLabels] = useState<Record<string, string>>(() => {
-    const initial: Record<string, string> = {
-      fresh: dish?.highlightLabels?.fresh || '',
-      ingredients: dish?.highlightLabels?.ingredients || '',
-      packaging: dish?.highlightLabels?.packaging || '',
-      delivery: dish?.highlightLabels?.delivery || '',
-    }
-    if (dish?.id && typeof window !== 'undefined') {
-      try {
-        const cachedL = localStorage.getItem(`hashousha_dish_highlight_labels_${dish.id}`) || (dish.slug ? localStorage.getItem(`hashousha_dish_highlight_labels_${dish.slug}`) : null)
-        if (cachedL) {
-          const parsedL = JSON.parse(cachedL)
-          if (parsedL && typeof parsedL === 'object') {
-            return {
-              fresh: dish?.highlightLabels?.fresh || parsedL.fresh || '',
-              ingredients: dish?.highlightLabels?.ingredients || parsedL.ingredients || '',
-              packaging: dish?.highlightLabels?.packaging || parsedL.packaging || '',
-              delivery: dish?.highlightLabels?.delivery || parsedL.delivery || '',
-            }
-          }
-        }
-      } catch {}
-    }
-    return initial
-  })
-
-  // Toggle to optionally propagate custom highlight texts as global defaults
-  const [saveAsGlobalHighlights, setSaveAsGlobalHighlights] = useState<boolean>(false)
+  // 4 Culinary Highlights Global Text State (Automatically updates across all dishes)
+  const [highlightLabels, setHighlightLabels] = useState<Record<string, string>>(() => ({
+    fresh: t('dishModal.highlightFresh', 'تحضير طازج يومياً بالرياض'),
+    ingredients: t('dishModal.highlightIngredients', 'زيت زيتون بكر ودبس رمان أصلي'),
+    packaging: t('dishModal.highlightPackaging', 'تغليف حراري مخصص للجمعات'),
+    delivery: t('dishModal.highlightDelivery', 'توصيل فوري لكافة أحياء الرياض'),
+  }))
 
   const handleToggleHighlight = (key: string) => {
     setHighlights((prev) =>
@@ -140,28 +118,24 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
       key: 'fresh',
       uiKey: 'dishModal.highlightFresh',
       defaultLabel: 'تحضير طازج يومياً بالرياض',
-      currentLabel: highlightLabels.fresh.trim() || t('dishModal.highlightFresh', 'تحضير طازج يومياً بالرياض'),
       hint: 'يؤكد للعميل أن المخبوزات والطبق يُحضّر طازجاً في نفس يوم الطلب',
     },
     {
       key: 'ingredients',
       uiKey: 'dishModal.highlightIngredients',
       defaultLabel: 'زيت زيتون بكر ودبس رمان أصلي',
-      currentLabel: highlightLabels.ingredients.trim() || t('dishModal.highlightIngredients', 'زيت زيتون بكر ودبس رمان أصلي'),
       hint: 'أبرز مكونات التحضير الفاخرة للطبق (مناسب للأصناف المالحة والتقليدية)',
     },
     {
       key: 'packaging',
       uiKey: 'dishModal.highlightPackaging',
       defaultLabel: 'تغليف حراري مخصص للجمعات',
-      currentLabel: highlightLabels.packaging.trim() || t('dishModal.highlightPackaging', 'تغليف حراري مخصص للجمعات'),
       hint: 'يظهر ميزة الصواني والبوكسات الحرارية الحافظة للحرارة والطراوة',
     },
     {
       key: 'delivery',
       uiKey: 'dishModal.highlightDelivery',
       defaultLabel: 'توصيل فوري لكافة أحياء الرياض',
-      currentLabel: highlightLabels.delivery.trim() || t('dishModal.highlightDelivery', 'توصيل فوري لكافة أحياء الرياض'),
       hint: 'ضمان وصول الطلب بحالته المثالية وطازجاً لكافة أحياء الرياض',
     },
   ]
@@ -337,24 +311,37 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
     }
 
     try {
-      if (saveAsGlobalHighlights) {
+      // Automatically update global Site Content (إدارة المظهر والمحتوى) for the 4 highlight texts
+      const globalUiUpdates: Record<string, string> = {}
+      if (highlightLabels.fresh?.trim()) globalUiUpdates['dishModal.highlightFresh'] = highlightLabels.fresh.trim()
+      if (highlightLabels.ingredients?.trim()) globalUiUpdates['dishModal.highlightIngredients'] = highlightLabels.ingredients.trim()
+      if (highlightLabels.packaging?.trim()) globalUiUpdates['dishModal.highlightPackaging'] = highlightLabels.packaging.trim()
+      if (highlightLabels.delivery?.trim()) globalUiUpdates['dishModal.highlightDelivery'] = highlightLabels.delivery.trim()
+
+      if (Object.keys(globalUiUpdates).length > 0) {
         try {
-          const globalUiUpdates: Record<string, string> = {}
-          if (highlightLabels.fresh?.trim()) globalUiUpdates['dishModal.highlightFresh'] = highlightLabels.fresh.trim()
-          if (highlightLabels.ingredients?.trim()) globalUiUpdates['dishModal.highlightIngredients'] = highlightLabels.ingredients.trim()
-          if (highlightLabels.packaging?.trim()) globalUiUpdates['dishModal.highlightPackaging'] = highlightLabels.packaging.trim()
-          if (highlightLabels.delivery?.trim()) globalUiUpdates['dishModal.highlightDelivery'] = highlightLabels.delivery.trim()
-          if (Object.keys(globalUiUpdates).length > 0) {
-            await saveSiteContent({
-              uiStrings: {
-                ...(content.uiStrings || {}),
-                ...globalUiUpdates,
-              },
-            })
-            await reloadSiteContent()
+          const newUiStrings = {
+            ...(content.uiStrings || {}),
+            ...globalUiUpdates,
           }
+          await saveSiteContent({
+            ...content,
+            uiStrings: newUiStrings,
+          })
+          updateContentLocally((prev) => ({
+            ...prev,
+            uiStrings: newUiStrings,
+          }))
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(
+              new CustomEvent('hashousha_content_updated', {
+                detail: { ...content, uiStrings: newUiStrings },
+              })
+            )
+          }
+          await reloadSiteContent()
         } catch (e) {
-          console.warn('Could not save global highlight labels:', e)
+          console.warn('Could not auto-save global highlight labels:', e)
         }
       }
 
@@ -407,8 +394,10 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
           </button>
         </div>
 
-        {/* Scrollable Form Body */}
-        <form onSubmit={handleSubmit} className="overflow-y-auto flex-1 p-5 sm:p-6 space-y-4">
+        {/* Form Container wrapping scrollable body and fixed footer */}
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden min-h-0">
+          {/* Scrollable Form Body */}
+          <div className="overflow-y-auto flex-1 p-5 sm:p-6 space-y-4">
           {errorMsg && (
             <div className="rounded-xl border border-rose-500/30 bg-rose-50/70 p-3 text-xs text-rose-900 flex items-center gap-2">
               <AlertCircle className="size-4 shrink-0 text-rose-700" />
@@ -686,7 +675,6 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
               {highlightOptions.map((opt) => {
                 const isChecked = highlights.includes(opt.key)
-                const customVal = highlightLabels[opt.key] !== undefined ? highlightLabels[opt.key] : ''
                 return (
                   <div
                     key={opt.key}
@@ -727,11 +715,11 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
                           <Edit3 className="size-3 text-primary" />
                           <span>نص الميزة للعميل:</span>
                         </span>
-                        {customVal.trim().length > 0 && customVal.trim() !== opt.defaultLabel && (
+                        {highlightLabels[opt.key]?.trim() && highlightLabels[opt.key]?.trim() !== opt.defaultLabel && (
                           <button
                             type="button"
-                            onClick={() => setHighlightLabels((prev) => ({ ...prev, [opt.key]: '' }))}
-                            className="text-[9.5px] text-primary hover:underline"
+                            onClick={() => setHighlightLabels((prev) => ({ ...prev, [opt.key]: opt.defaultLabel }))}
+                            className="text-[9.5px] text-primary hover:underline cursor-pointer"
                           >
                             استعادة الافتراضي
                           </button>
@@ -739,7 +727,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
                       </div>
                       <input
                         type="text"
-                        value={customVal !== '' ? customVal : opt.currentLabel}
+                        value={highlightLabels[opt.key] ?? opt.defaultLabel}
                         onChange={(e) => {
                           const val = e.target.value
                           setHighlightLabels((prev) => ({ ...prev, [opt.key]: val }))
@@ -763,29 +751,24 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
               })}
             </div>
 
-            {/* Bottom Controls: Save as Global Default & Reset */}
+            {/* Bottom Controls: Auto-sync notice & Reset */}
             <div className="pt-2 border-t border-primary/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
-              <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-foreground/90 font-medium">
-                <input
-                  type="checkbox"
-                  checked={saveAsGlobalHighlights}
-                  onChange={(e) => setSaveAsGlobalHighlights(e.target.checked)}
-                  className="size-4 rounded border-primary/40 text-primary focus:ring-primary/40 cursor-pointer"
-                />
-                <span>تعميم هذه النصوص كافتراضية لكافة أطباق المتجر (تحديث المظهر والمحتوى تلقائياً)</span>
-              </label>
+              <div className="flex items-center gap-1.5 text-xs text-primary/80 font-medium">
+                <span className="inline-block size-2 rounded-full bg-primary animate-pulse shrink-0" />
+                <span>تعديل هذه النصوص يُعمم تلقائياً كافتراضي لكافة أطباق المتجر (المظهر والمحتوى).</span>
+              </div>
 
               <button
                 type="button"
                 onClick={() => {
                   setHighlightLabels({
-                    fresh: '',
-                    ingredients: '',
-                    packaging: '',
-                    delivery: '',
+                    fresh: 'تحضير طازج يومياً بالرياض',
+                    ingredients: 'زيت زيتون بكر ودبس رمان أصلي',
+                    packaging: 'تغليف حراري مخصص للجمعات',
+                    delivery: 'توصيل فوري لكافة أحياء الرياض',
                   })
                 }}
-                className="text-[11px] text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 shrink-0"
+                className="text-[11px] text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 shrink-0 cursor-pointer"
               >
                 <RotateCcw className="size-3" />
                 <span>إعادة ضبط النصوص للافتراضي</span>
@@ -1221,32 +1204,48 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
                 ))}
             </div>
           </div>
+        </div>
 
-          {/* Submit Actions */}
-          <div className="border-t border-border/80 pt-4 flex items-center justify-end gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={saving}
-              className="rounded-xl border border-border px-5 py-2.5 text-xs font-semibold text-muted-foreground hover:bg-secondary transition-colors"
-            >
-              إلغاء
-            </button>
-
-            <button
-              type="submit"
-              disabled={saving || uploadingImage}
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-xs font-bold text-primary-foreground shadow-md hover:bg-primary/95 transition-all disabled:opacity-50"
-            >
-              {saving ? (
-                <>
-                  <Loader2 className="size-4 animate-spin" />
-                  <span>جاري حفظ الطبق...</span>
-                </>
+        {/* Fixed / Pinned Submit Footer */}
+          <div className="border-t border-border/80 p-4 sm:px-6 shrink-0 bg-card/95 backdrop-blur-md flex items-center justify-between gap-3 z-10 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span className="inline-block size-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+              {dish ? (
+                <span className="truncate max-w-[180px] sm:max-w-xs font-semibold text-foreground/80">
+                  تعديل: {dish.name}
+                </span>
               ) : (
-                <span>{dish ? 'حفظ التعديلات' : 'إضافة الطبق للقائمة'}</span>
+                <span className="font-semibold text-foreground/80">
+                  إضافة طبق جديد
+                </span>
               )}
-            </button>
+            </div>
+
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={saving}
+                className="rounded-xl border border-border px-5 py-2.5 text-xs font-semibold text-muted-foreground hover:bg-secondary transition-colors cursor-pointer"
+              >
+                إلغاء
+              </button>
+
+              <button
+                type="submit"
+                disabled={saving || uploadingImage}
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-xs font-bold text-primary-foreground shadow-md hover:bg-primary/95 transition-all disabled:opacity-50 cursor-pointer"
+              >
+                {saving ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin" />
+                    <span>جاري حفظ الطبق...</span>
+                  </>
+                ) : (
+                  <span>{dish ? 'حفظ التعديلات' : 'إضافة الطبق للقائمة'}</span>
+                )}
+              </button>
+            </div>
           </div>
         </form>
       </div>

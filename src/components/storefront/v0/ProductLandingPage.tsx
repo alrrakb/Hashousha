@@ -97,19 +97,6 @@ export const ProductLandingPage: React.FC<ProductLandingPageProps> = ({
       } catch {}
     }
 
-    let localLabels: Record<string, string> = dish?.highlightLabels || {}
-    if (dish && typeof window !== 'undefined') {
-      try {
-        const cachedL = localStorage.getItem(`hashousha_dish_highlight_labels_${dish.id}`) || (dish.slug ? localStorage.getItem(`hashousha_dish_highlight_labels_${dish.slug}`) : null)
-        if (cachedL) {
-          const parsedL = JSON.parse(cachedL)
-          if (parsedL && typeof parsedL === 'object') {
-            localLabels = { ...parsedL, ...localLabels }
-          }
-        }
-      } catch {}
-    }
-
     return HIGHLIGHT_CONFIG
       .filter((item) => {
         if (Array.isArray(selectedKeys)) {
@@ -119,7 +106,7 @@ export const ProductLandingPage: React.FC<ProductLandingPageProps> = ({
       })
       .map((item) => ({
         key: item.key,
-        label: localLabels[item.key]?.trim() || t(item.uiKey, item.defaultLabel),
+        label: t(item.uiKey, item.defaultLabel),
       }))
   })()
 
